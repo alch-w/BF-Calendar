@@ -605,6 +605,16 @@ body {
   letter-spacing: 0;
 }
 
+.cal-stage-note {
+  font-size: 0.58rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.15;
+  opacity: 0.85;
+}
+
 .cal-time {
   border-right: 1px solid var(--grid-line);
   font-size: 0.68rem;

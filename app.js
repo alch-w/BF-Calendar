@@ -3,10 +3,10 @@ const LEGACY_SCHEDULE_STORAGE_KEY = "festival-schedule-v2";
 const FLAGS_STORAGE_KEY = "festival-flags-v1";
 const FLAGS_TODAY_ONLY_STORAGE_KEY = "festival-flags-today-only-v1";
 
-/** @typedef {{ artist: string; start: string; end: string; kind?: string; note?: string }} Set */
-/** @typedef {{ id: string; name: string; sets: Set[]; closesAt?: string; closureNote?: string }} Stage */
-/** @typedef {{ id: string; label: string; date: string; stages: Stage[]; hidden?: boolean }} Day */
-/** @typedef {{ festival: string; timezone?: string; days: Day[] }} Schedule */
+/** @typedef {{ artist: string; start: string; end: string | null; kind?: string; note?: string }} Set */
+/** @typedef {{ id: string; name: string; sets: Set[]; closesAt?: string; closureNote?: string; notes?: string }} Stage */
+/** @typedef {{ id: string; label: string; date: string; stages: Stage[]; hidden?: boolean; extras?: unknown[] }} Day */
+/** @typedef {{ festival: string; timezone?: string; notes?: string; days: Day[] }} Schedule */
 
 /** @type {Schedule | null} */
 let schedule = null;
@@ -53,12 +53,14 @@ function validateSchedule(data) {
   let anyDay = false;
   for (const day of data.days) {
     if (!day.date || !day.label || !Array.isArray(day.stages)) return "Invalid day entry";
+    if (day.extras !== undefined && !Array.isArray(day.extras)) return "Invalid day extras";
     if (!dayHasSchedule(day) && !day.hidden) continue;
     if (dayHasSchedule(day)) anyDay = true;
     for (const stage of day.stages) {
       if (!stage.name || !Array.isArray(stage.sets)) return "Invalid stage entry";
       for (const set of stage.sets) {
-        if (!set.artist || !set.start || set.end === undefined) return "Invalid set entry";
+        if (!set.artist || !set.start) return "Invalid set entry";
+        if (set.end !== null && (set.end === undefined || typeof set.end !== "string")) return "Invalid set entry";
       }
     }
   }
@@ -73,9 +75,36 @@ function parseClockOnFestivalDay(dayDate, timeStr) {
   return new Date(y, m - 1, d + dayOffset, h, min, 0, 0);
 }
 
-function parseSetTimes(dayDate, set) {
+/**
+ * @param {string} dayDate
+ * @param {Set} set
+ * @param {Stage | null} [stage]
+ * @param {number} [playableIndex] index within playableSets(stage), or -1 to resolve
+ */
+function parseSetTimes(dayDate, set, stage = null, playableIndex = -1) {
   const start = parseClockOnFestivalDay(dayDate, set.start);
-  let end = parseClockOnFestivalDay(dayDate, set.end);
+  let end;
+  if (set.end != null && set.end !== "") {
+    end = parseClockOnFestivalDay(dayDate, set.end);
+  } else if (stage) {
+    const playable = playableSets(stage);
+    const idx = playableIndex >= 0 ? playableIndex : playable.indexOf(set);
+    if (idx >= 0 && idx < playable.length - 1) {
+      end = parseClockOnFestivalDay(dayDate, playable[idx + 1].start);
+    } else {
+      const [h, min] = set.start.split(":").map(Number);
+      const startAfterFour = h > 4 || (h === 4 && min > 0);
+      if (startAfterFour) {
+        end = new Date(start.getTime() + 60 * 60 * 1000);
+      } else if (stage.closesAt) {
+        end = parseClockOnFestivalDay(dayDate, stage.closesAt);
+      } else {
+        end = new Date(start.getTime() + 60 * 60 * 1000);
+      }
+    }
+  } else {
+    end = new Date(start.getTime() + 60 * 60 * 1000);
+  }
   if (set.kind === "closure" || end <= start) {
     end = new Date(start.getTime() + (set.kind === "closure" ? 0 : 60 * 60 * 1000));
   }
@@ -285,10 +314,12 @@ function collectFlaggedUpcoming(now = new Date()) {
   for (const day of schedule.days) {
     if (!dayHasSchedule(day)) continue;
     for (const stage of day.stages) {
-      for (const set of playableSets(stage)) {
+      const playable = playableSets(stage);
+      for (let pi = 0; pi < playable.length; pi += 1) {
+        const set = playable[pi];
         const id = makeSetId(day, stage, set);
         if (!isFlagged(id)) continue;
-        const { start, end } = parseSetTimes(day.date, set);
+        const { start, end } = parseSetTimes(day.date, set, stage, pi);
         if (end.getTime() <= t) continue;
         out.push({ day, stage, set, start, end });
       }
@@ -418,8 +449,10 @@ function findActiveDay(now = new Date()) {
     let dayEnd = 0;
     let dayStart = Infinity;
     for (const stage of day.stages) {
-      for (const set of playableSets(stage)) {
-        const { start, end } = parseSetTimes(day.date, set);
+      const playable = playableSets(stage);
+      for (let pi = 0; pi < playable.length; pi += 1) {
+        const set = playable[pi];
+        const { start, end } = parseSetTimes(day.date, set, stage, pi);
         dayStart = Math.min(dayStart, start.getTime());
         dayEnd = Math.max(dayEnd, end.getTime());
       }
@@ -445,8 +478,10 @@ function getNowAndNext(stage, dayDate, now = new Date()) {
   let current = null;
   let next = null;
 
-  for (const set of playableSets(stage)) {
-    const { start, end } = parseSetTimes(dayDate, set);
+  const playable = playableSets(stage);
+  for (let pi = 0; pi < playable.length; pi += 1) {
+    const set = playable[pi];
+    const { start, end } = parseSetTimes(dayDate, set, stage, pi);
     if (t >= start.getTime() && t < end.getTime()) {
       current = { set, start, end };
     } else if (start.getTime() > t && !next) {
@@ -455,8 +490,9 @@ function getNowAndNext(stage, dayDate, now = new Date()) {
   }
 
   if (!next && !current) {
-    for (const set of playableSets(stage)) {
-      const { start, end } = parseSetTimes(dayDate, set);
+    for (let pi = 0; pi < playable.length; pi += 1) {
+      const set = playable[pi];
+      const { start, end } = parseSetTimes(dayDate, set, stage, pi);
       if (start.getTime() > t) {
         next = { set, start, end };
         break;
@@ -589,8 +625,10 @@ function buildHourGrid(dayDate, stages) {
   let min = Infinity;
   let max = -Infinity;
   for (const stage of stages) {
+    const playable = playableSets(stage);
     for (const set of stage.sets) {
-      const { start, end } = parseSetTimes(dayDate, set);
+      const pi = playable.indexOf(set);
+      const { start, end } = parseSetTimes(dayDate, set, stage, pi);
       min = Math.min(min, start.getTime());
       max = Math.max(max, end.getTime());
     }
@@ -623,8 +661,8 @@ function currentTimeRowIndex(hours, now) {
   return -1;
 }
 
-function appendCalEvent(colBody, day, stage, set, gridStart) {
-  const { start, end } = parseSetTimes(day.date, set);
+function appendCalEvent(colBody, day, stage, set, gridStart, playableIndex = -1) {
+  const { start, end } = parseSetTimes(day.date, set, stage, playableIndex);
   const topPx = ((start.getTime() - gridStart) / (60 * 60 * 1000)) * CAL_ROW_PX;
   let heightPx = ((end.getTime() - start.getTime()) / (60 * 60 * 1000)) * CAL_ROW_PX;
   if (set.kind === "closure") heightPx = Math.max(CAL_ROW_PX * 0.85, 34);
@@ -711,6 +749,12 @@ function renderSchedule() {
       close.textContent = headCloses;
       head.appendChild(close);
     }
+    if (stage.notes) {
+      const note = document.createElement("span");
+      note.className = "cal-stage-note";
+      note.textContent = stage.notes;
+      head.appendChild(note);
+    }
     headCols.appendChild(head);
   }
   headRow.appendChild(headCols);
@@ -750,8 +794,10 @@ function renderSchedule() {
       colBody.appendChild(line);
     }
 
+    const playable = playableSets(stage);
     for (const set of stage.sets) {
-      appendCalEvent(colBody, day, stage, set, gridStart);
+      const pi = playable.indexOf(set);
+      appendCalEvent(colBody, day, stage, set, gridStart, pi);
     }
 
     const closeClock = getStageClosesAtClock(day.date, stage);
