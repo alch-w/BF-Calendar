@@ -229,7 +229,6 @@ function renderFlaggedUpcoming(now = new Date()) {
   }
 
   const clashingIds = findClashingFlaggedIds(items);
-  const hasClash = clashingIds.size > 0;
 
   const list = document.createElement("ul");
   list.className = "flagged-list";
@@ -274,12 +273,6 @@ function renderFlaggedUpcoming(now = new Date()) {
   h2.className = "flagged-heading";
   h2.textContent = "Flagged upcoming";
   el.flaggedUpcoming.appendChild(h2);
-  if (hasClash) {
-    const note = document.createElement("p");
-    note.className = "flagged-clash-note";
-    note.textContent = "You flagged clashing sets";
-    el.flaggedUpcoming.appendChild(note);
-  }
   el.flaggedUpcoming.appendChild(list);
 }
 
