@@ -26,10 +26,16 @@
         <h1 id="festival-name">Bang Face</h1>
         <p id="context-line" class="context-line" aria-live="polite"></p>
       </div>
-      <nav class="view-tabs" role="tablist" aria-label="Main views">
-        <button type="button" class="tab active" data-view="now" role="tab" aria-selected="true">Now</button>
-        <button type="button" class="tab" data-view="schedule" role="tab" aria-selected="false">Schedule</button>
-      </nav>
+      <div class="header-tools">
+        <nav class="view-tabs" role="tablist" aria-label="Main views">
+          <button type="button" class="tab active" data-view="now" role="tab" aria-selected="true">Now</button>
+          <button type="button" class="tab" data-view="schedule" role="tab" aria-selected="false">Schedule</button>
+        </nav>
+        <div class="clock-switch" role="group" aria-label="Clock format">
+          <button type="button" class="clock-switch-btn is-active" data-clock="24" aria-pressed="true" aria-label="24-hour clock">24h</button>
+          <button type="button" class="clock-switch-btn" data-clock="12" aria-pressed="false" aria-label="12-hour clock">12h</button>
+        </div>
+      </div>
     </header>
 
     <main id="view-now" class="view panel" role="tabpanel">

@@ -122,6 +122,19 @@ body {
   color: var(--muted);
 }
 
+.header-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.35rem;
+  margin-right: -2.75rem;
+}
+
+.header-tools .view-tabs {
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+
 .view-tabs {
   display: flex;
   gap: 0.35rem;
@@ -303,7 +316,8 @@ body {
   outline-offset: 2px;
 }
 
-.flagged-view-switch {
+.flagged-view-switch,
+.clock-switch {
   display: inline-flex;
   align-items: stretch;
   gap: 0.12rem;
@@ -313,7 +327,12 @@ body {
   border-radius: 4px;
 }
 
-.flagged-view-btn {
+.clock-switch {
+  flex: 0 0 auto;
+}
+
+.flagged-view-btn,
+.clock-switch-btn {
   appearance: none;
   -webkit-appearance: none;
   border: none;
@@ -333,12 +352,14 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-.flagged-view-btn.is-active {
+.flagged-view-btn.is-active,
+.clock-switch-btn.is-active {
   background: var(--accent);
   color: #ffffff;
 }
 
-.flagged-view-btn:focus-visible {
+.flagged-view-btn:focus-visible,
+.clock-switch-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -1064,4 +1085,46 @@ body:has(#view-schedule:not(.hidden)) .cal-scroll-wrap {
   :root {
     --cal-col-w: 7.25rem;
   }
+}
+
+body.clock-12 {
+  --cal-gutter-w: 4.15rem;
+}
+
+body.clock-12 .cal-time {
+  font-size: 0.6rem;
+  letter-spacing: -0.01em;
+  padding-right: 0.2rem;
+}
+
+body.clock-12 .slot {
+  grid-template-columns: 7.7rem 1fr;
+}
+
+body.clock-12 .slot .time {
+  font-size: 0.7rem;
+  line-height: 1.25;
+}
+
+body.clock-12 .flagged-row:not(.flagged-row-compact) {
+  grid-template-columns: 7.7rem 1fr;
+}
+
+body.clock-12 .flagged-row:not(.flagged-row-compact) .flagged-time {
+  font-size: 0.68rem;
+  line-height: 1.25;
+}
+
+body.clock-12 .flagged-compact-time {
+  font-size: 0.64rem;
+}
+
+body.clock-12 .cal-event-time {
+  font-size: 0.52rem;
+  line-height: 1.15;
+}
+
+body.clock-12 .cal-event-compact .cal-event-time {
+  font-size: 0.48rem;
+  line-height: 1.05;
 }

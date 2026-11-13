@@ -3,6 +3,8 @@ const LEGACY_SCHEDULE_STORAGE_KEY = "festival-schedule-v2";
 const FLAGS_STORAGE_KEY = "festival-flags-v1";
 const FLAGS_TODAY_ONLY_STORAGE_KEY = "festival-flags-today-only-v1";
 const FLAGS_VIEW_STORAGE_KEY = "festival-flags-view-v1";
+/** Device-only display preference. Not part of the #f= share token. */
+const CLOCK_12H_STORAGE_KEY = "festival-clock-12h-v1";
 
 /** @typedef {{ artist: string; start: string; end: string | null; kind?: string; note?: string }} Set */
 /** @typedef {{ id: string; name: string; sets: Set[]; closesAt?: string; closureNote?: string; notes?: string }} Stage */
@@ -35,6 +37,10 @@ let flagsTodayOnly = loadFlagsTodayOnly();
 
 /** "cards" is the richer Flagged rows; "compact" is the one-line view. */
 let flagsView = loadFlagsView();
+
+/** Displayed clock times. Schedule data stays 24-hour. Default off. */
+let clock12 = loadClock12();
+syncClockSwitch();
 
 /** Shown under Flagged upcoming after a share or a soft-failed link. */
 let shareNotice = "";
@@ -132,7 +138,29 @@ function localDateString(date = new Date()) {
 }
 
 function formatTime(date) {
+  if (clock12) {
+    const h24 = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const suffix = h24 >= 12 ? "PM" : "AM";
+    const h12 = h24 % 12 || 12;
+    return `${h12}:${minutes}\u00a0${suffix}`;
+  }
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+}
+
+/** 24-hour HH:MM for values that get parsed again. Not for display. */
+function formatTime24(date) {
+  const h = String(date.getHours()).padStart(2, "0");
+  const m = String(date.getMinutes()).padStart(2, "0");
+  return `${h}:${m}`;
+}
+
+/** Start–end for display. 12-hour ranges may wrap after the dash. */
+function formatClockRange(start, end) {
+  const startLabel = formatTime(start);
+  const endLabel = formatTime(end);
+  if (!clock12) return `${startLabel}–${endLabel}`;
+  return `${startLabel}–\u200b${endLabel}`;
 }
 
 /** Whole minutes for human countdown copy (e.g. 45m, 2h 15m). */
@@ -203,15 +231,22 @@ function stageCloseTimeMs(dayDate, stage) {
   return closeMs;
 }
 
-/** @returns {string | null} 24h HH:MM for display */
+/** @returns {string | null} 24h HH:MM for positioning, not the display setting */
 function getStageClosesAtClock(dayDate, stage) {
+  const closeMs = stageCloseTimeMs(dayDate, stage);
+  if (!closeMs) return null;
+  return formatTime24(new Date(closeMs));
+}
+
+/** @returns {string | null} close time in the active display clock */
+function formatStageCloseClock(dayDate, stage) {
   const closeMs = stageCloseTimeMs(dayDate, stage);
   if (!closeMs) return null;
   return formatTime(new Date(closeMs));
 }
 
 function formatStageClosesLabel(dayDate, stage) {
-  const clock = getStageClosesAtClock(dayDate, stage);
+  const clock = formatStageCloseClock(dayDate, stage);
   return clock ? `Closes ${clock}` : null;
 }
 
@@ -268,6 +303,54 @@ function loadFlagsView() {
 
 function saveFlagsView() {
   localStorage.setItem(FLAGS_VIEW_STORAGE_KEY, flagsView);
+}
+
+function loadClock12() {
+  try {
+    const raw = localStorage.getItem(CLOCK_12H_STORAGE_KEY);
+    return raw === "1" || raw === "true";
+  } catch {
+    return false;
+  }
+}
+
+function saveClock12() {
+  localStorage.setItem(CLOCK_12H_STORAGE_KEY, clock12 ? "1" : "0");
+}
+
+function syncClockSwitch() {
+  document.body.classList.toggle("clock-12", clock12);
+  document.querySelectorAll(".clock-switch-btn").forEach((btn) => {
+    const on = (btn.dataset.clock === "12") === clock12;
+    btn.classList.toggle("is-active", on);
+    btn.setAttribute("aria-pressed", String(on));
+  });
+}
+
+function setClock12(next) {
+  if (clock12 === next) return;
+  clock12 = next;
+  saveClock12();
+  syncClockSwitch();
+  if (!schedule) return;
+  const scroller = document.querySelector(".cal-scroll-wrap");
+  const left = scroller ? scroller.scrollLeft : 0;
+  const top = scroller ? scroller.scrollTop : 0;
+  renderNow();
+  renderSchedule();
+  if (scroller) {
+    scroller.scrollLeft = left;
+    scroller.scrollTop = top;
+  }
+}
+
+function wireClockSwitch() {
+  syncClockSwitch();
+  document.querySelectorAll(".clock-switch-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setClock12(btn.dataset.clock === "12");
+    });
+  });
 }
 
 function showFlaggedTodayOnlyToggle() {
@@ -726,9 +809,8 @@ function filterFlaggedForTodayOnly(items, now = new Date()) {
 
 /** Start–end, or start alone when the set has no end. */
 function formatFlaggedClockRange(set, start, end) {
-  const startLabel = formatTime(start);
-  if (set.end == null || set.end === "") return startLabel;
-  return `${startLabel}–${formatTime(end)}`;
+  if (set.end == null || set.end === "") return formatTime(start);
+  return formatClockRange(start, end);
 }
 
 function createFlaggedCardRow({ day, stage, set, start, end }, now, clashingIds) {
@@ -746,7 +828,7 @@ function createFlaggedCardRow({ day, stage, set, start, end }, now, clashingIds)
     ? `<span class="flagged-playing-in-sep" aria-hidden="true">·</span><span class="flagged-time-until is-${countdown.kind}">${escapeHtml(countdown.text)}</span>`
     : "";
   li.innerHTML = `
-    <span class="flagged-time">${escapeHtml(formatTime(start))}–${escapeHtml(formatTime(end))}</span>
+    <span class="flagged-time">${escapeHtml(formatClockRange(start, end))}</span>
     <span class="flagged-meta">
       <span class="flagged-playing-in">
         <span class="flagged-playing-in-label">Playing in</span>
@@ -1003,7 +1085,7 @@ function renderNow() {
       const shut = document.createElement("div");
       shut.className = "slot closure";
       const note = stage.closureNote || "Room closed — head to other rooms";
-      const closedClock = getStageClosesAtClock(active.day.date, stage) || "";
+      const closedClock = formatStageCloseClock(active.day.date, stage) || "";
       shut.innerHTML = `<div class="time">${escapeHtml(closedClock)}</div><div><span class="badge idle">Closed</span><div class="artist">${escapeHtml(note)}</div></div>`;
       card.appendChild(shut);
       el.nowList.appendChild(card);
@@ -1027,7 +1109,7 @@ function renderNow() {
     } else if (closesLabel || stageHasClosureNote(stage)) {
       const hint = document.createElement("div");
       hint.className = "slot";
-      const closeClock = getStageClosesAtClock(active.day.date, stage) || "—";
+      const closeClock = formatStageCloseClock(active.day.date, stage) || "—";
       hint.innerHTML = `<div class="time">${escapeHtml(closeClock)}</div><div class="artist muted-text">${escapeHtml(stage.closureNote || "Room closes")}</div>`;
       card.appendChild(hint);
     } else {
@@ -1048,7 +1130,7 @@ function slotEl({ set, start, end }, kind, badgeLabel) {
   const row = document.createElement("div");
   row.className = `slot ${kind}`;
   row.innerHTML = `
-    <div class="time">${formatTime(start)}–${formatTime(end)}</div>
+    <div class="time">${formatClockRange(start, end)}</div>
     <div>
       <span class="badge ${kind === "now" ? "live" : "upnext"}">${badgeLabel}</span>
       <div class="artist">${escapeHtml(set.artist)}</div>
@@ -1124,7 +1206,7 @@ function appendCalEvent(colBody, day, stage, set, gridStart, playableIndex = -1)
   }
 
   const label = set.kind === "closure" ? set.note || set.artist : set.artist;
-  const timeLabel = set.kind === "closure" ? set.start : `${formatTime(start)}–${formatTime(end)}`;
+  const timeLabel = set.kind === "closure" ? formatTime(start) : formatClockRange(start, end);
 
   const timeSpan = document.createElement("span");
   timeSpan.className = "cal-event-time";
@@ -1569,6 +1651,7 @@ function wireUi() {
   });
   window.addEventListener("hashchange", () => onShareUrlChanged());
   wireRabbitEgg();
+  wireClockSwitch();
 }
 
 let initStarted = false;
