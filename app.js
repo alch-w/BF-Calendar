@@ -815,10 +815,111 @@ function startClockTick() {
   }, 30_000);
 }
 
+/** @type {boolean} */
+let rabbitRainRunning = false;
+
+/** @type {number | null} */
+let rabbitRainRaf = null;
+
+/** @type {ReturnType<typeof setInterval> | null} */
+let rabbitRainSpawnTimer = null;
+
+function stopRabbitRainLayer(layer) {
+  if (rabbitRainSpawnTimer !== null) {
+    clearInterval(rabbitRainSpawnTimer);
+    rabbitRainSpawnTimer = null;
+  }
+  if (rabbitRainRaf !== null) {
+    cancelAnimationFrame(rabbitRainRaf);
+    rabbitRainRaf = null;
+  }
+  layer.remove();
+  rabbitRainRunning = false;
+}
+
+function startRabbitRain() {
+  if (rabbitRainRunning) return;
+  rabbitRainRunning = true;
+
+  const layer = document.createElement("div");
+  layer.className = "rabbit-rain-layer";
+  layer.setAttribute("aria-hidden", "true");
+  document.body.appendChild(layer);
+
+  const durationMs = 3500;
+  const spawnUntil = performance.now() + durationMs;
+  /** @type {{ el: HTMLElement; x: number; y: number; vy: number; drift: number }[]} */
+  const drops = [];
+
+  const spawnDrop = () => {
+    const el = document.createElement("span");
+    el.className = "rabbit-rain-drop";
+    el.textContent = "🐰";
+    const maxX = Math.max(0, window.innerWidth - 28);
+    const x = Math.random() * maxX;
+    drops.push({
+      el,
+      x,
+      y: -24 - Math.random() * 40,
+      vy: 2.2 + Math.random() * 2.8,
+      drift: (Math.random() - 0.5) * 1.1,
+    });
+    layer.appendChild(el);
+  };
+
+  rabbitRainSpawnTimer = setInterval(() => {
+    if (performance.now() >= spawnUntil) {
+      if (rabbitRainSpawnTimer !== null) clearInterval(rabbitRainSpawnTimer);
+      rabbitRainSpawnTimer = null;
+      return;
+    }
+    spawnDrop();
+    if (Math.random() < 0.35) spawnDrop();
+  }, 95);
+
+  const startedAt = performance.now();
+
+  const tick = () => {
+    const vh = window.innerHeight;
+    for (let i = drops.length - 1; i >= 0; i -= 1) {
+      const drop = drops[i];
+      drop.y += drop.vy;
+      drop.x += drop.drift;
+      drop.el.style.transform = `translate3d(${drop.x}px, ${drop.y}px, 0)`;
+      if (drop.y > vh - 64) {
+        const fade = Math.max(0, 1 - (drop.y - (vh - 64)) / 64);
+        drop.el.style.opacity = String(fade);
+      }
+      if (drop.y > vh + 32) {
+        drop.el.remove();
+        drops.splice(i, 1);
+      }
+    }
+
+    const spawnDone = performance.now() >= spawnUntil;
+    const elapsed = performance.now() - startedAt;
+    if ((spawnDone && drops.length === 0) || elapsed > durationMs + 4500) {
+      stopRabbitRainLayer(layer);
+      return;
+    }
+    rabbitRainRaf = requestAnimationFrame(tick);
+  };
+
+  spawnDrop();
+  rabbitRainRaf = requestAnimationFrame(tick);
+}
+
+function wireRabbitEgg() {
+  const btn = document.getElementById("rabbit-egg-btn");
+  if (!btn) return;
+  btn.addEventListener("click", () => startRabbitRain());
+}
+
 function wireUi() {
   document.querySelectorAll(".tab").forEach((tab) => {
     tab.addEventListener("click", () => setView(tab.dataset.view));
   });
+  wireRabbitEgg();
 }
 
 async function init() {

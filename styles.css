@@ -47,7 +47,63 @@ body {
   z-index: 10;
   background: linear-gradient(var(--bg) 85%, transparent);
   padding: max(0.75rem, env(safe-area-inset-top)) 1rem 0.5rem;
+  padding-right: calc(1rem + 2.75rem);
   border-bottom: 1px solid var(--accent-border);
+}
+
+.rabbit-egg-btn {
+  position: absolute;
+  top: max(0.35rem, env(safe-area-inset-top));
+  right: 0.65rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid rgba(225, 6, 0, 0.35);
+  border-radius: 999px;
+  background: rgba(12, 12, 12, 0.85);
+  color: var(--text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.rabbit-egg-btn:hover {
+  border-color: var(--accent-border);
+  background: var(--surface);
+}
+
+.rabbit-egg-btn:active {
+  transform: scale(0.94);
+}
+
+.rabbit-egg-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.rabbit-rain-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rabbit-rain-drop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 1.35rem;
+  line-height: 1;
+  will-change: transform, opacity;
+  user-select: none;
 }
 
 .brand h1 {
