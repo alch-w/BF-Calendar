@@ -16,7 +16,7 @@ The app loads **`schedule.json` only** (no in-app editor). Edit that file in the
 
 **After-midnight** slot times (`00:00`–`05:59`) count as the night after `date` (Saturday poster → Sunday morning).
 
-The bundled `schedule.json` includes **Friday, Saturday, and Sunday** (2026-11-13 — 2026-11-16). The **Schedule** tab shows Fri / Sat / Sun buttons when multiple days have sets; **Now** auto-picks the active festival day from the phone date and clock.
+The bundled `schedule.json` includes **Friday, Saturday, and Sunday** (`2026-11-13`, `2026-11-14`, `2026-11-15`; festival runs through Mon 2026-11-16). The **Schedule** tab shows Fri / Sat / Sun buttons when multiple days have sets; **Now** auto-picks the active festival day from the phone date and clock.
 
 ## Minimal sample
 

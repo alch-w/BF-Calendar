@@ -153,7 +153,7 @@
               "end": "19:00"
             },
             {
-              "artist": "Breezyc",
+              "artist": "BreezyC",
               "start": "19:00",
               "end": "20:00"
             },
@@ -209,7 +209,7 @@
               "end": "16:00"
             },
             {
-              "artist": "Half East Records (Ting Run Run, Kuya Betas, Beejibe, Tirta)",
+              "artist": "Half East Records (Ting Run Run, Kuya Betas, Bejeebe, Tirta)",
               "start": "16:00",
               "end": "20:00"
             },
@@ -230,7 +230,7 @@
     {
       "id": "saturday",
       "label": "Saturday",
-      "date": "2026-11-15",
+      "date": "2026-11-14",
       "stages": [
         {
           "id": "bang-room",
@@ -241,7 +241,7 @@
             {
               "artist": "Shadesy & P-Hocto",
               "start": "17:00",
-              "end": "18:00"
+              "end": "19:00"
             },
             {
               "artist": "The Liberators",
@@ -426,57 +426,57 @@
               "end": "16:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "Team GB",
               "start": "16:00",
               "end": "17:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "Jakazid",
               "start": "17:00",
               "end": "18:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "DJ Evo",
               "start": "18:00",
               "end": "19:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "M-Rei",
               "start": "19:00",
               "end": "20:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "Ectomorph",
               "start": "20:00",
               "end": "21:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "Jack in Box",
               "start": "21:00",
               "end": "22:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "CLSM",
               "start": "22:00",
               "end": "23:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "Fracus & Darwin",
               "start": "23:00",
               "end": "00:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "Aerbreak",
               "start": "00:00",
               "end": "01:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "Alzoc III",
               "start": "01:00",
               "end": "02:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "Syran",
               "start": "02:00",
               "end": "03:00"
             },
@@ -528,7 +528,7 @@
     {
       "id": "sunday",
       "label": "Sunday",
-      "date": "2026-11-16",
+      "date": "2026-11-15",
       "stages": [
         {
           "id": "bang-room",
@@ -543,6 +543,11 @@
               "artist": "\u2014",
               "start": "14:00",
               "end": "15:00"
+            },
+            {
+              "artist": "\u2014",
+              "start": "15:00",
+              "end": "16:00"
             },
             {
               "artist": "Brain Rays & Quiet",
@@ -560,12 +565,12 @@
               "end": "19:00"
             },
             {
-              "artist": "PhoteK",
+              "artist": "Photek",
               "start": "19:00",
               "end": "20:00"
             },
             {
-              "artist": "G Jones & Eprom",
+              "artist": "G Jones & EPROM",
               "start": "20:00",
               "end": "22:00"
             },
@@ -575,7 +580,7 @@
               "end": "23:00"
             },
             {
-              "artist": "Saint Acid & The Bang Face Hard Crew",
+              "artist": "Closing Party: Saint Acid & The Bang Face Hard Crew",
               "start": "23:00",
               "end": "01:00"
             }
@@ -586,13 +591,8 @@
           "name": "Face",
           "sets": [
             {
-              "artist": "2025 Winner!",
+              "artist": "Cosmic Turtle (2025 Winner)",
               "start": "13:00",
-              "end": "14:00"
-            },
-            {
-              "artist": "Cosmic Turtle",
-              "start": "14:00",
               "end": "15:00"
             },
             {
@@ -601,7 +601,7 @@
               "end": "16:00"
             },
             {
-              "artist": "2quid",
+              "artist": "2Quid",
               "start": "16:00",
               "end": "17:00"
             },
@@ -667,7 +667,7 @@
               "end": "16:00"
             },
             {
-              "artist": "300skullsandcounting & Jenny Sparks",
+              "artist": "300SkullsAndCounting & Jenny Sparks",
               "start": "16:00",
               "end": "17:00"
             },
@@ -715,47 +715,47 @@
           "closureNote": "Hotshots closes 11pm",
           "sets": [
             {
-              "artist": "DJ AR",
+              "artist": "DJ Ar",
               "start": "13:00",
               "end": "14:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "Slinki",
               "start": "14:00",
               "end": "15:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "Ac1d Vicious",
               "start": "15:00",
               "end": "16:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "DJ Cries In Spanish",
               "start": "16:00",
               "end": "17:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "Koarse",
               "start": "17:00",
               "end": "18:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "JmDasha",
               "start": "18:00",
               "end": "19:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "Chy",
               "start": "19:00",
               "end": "20:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "Phia Sky",
               "start": "20:00",
               "end": "21:00"
             },
             {
-              "artist": "\u2014",
+              "artist": "Keptek",
               "start": "21:00",
               "end": "22:00"
             },
@@ -783,7 +783,7 @@
               "end": "14:00"
             },
             {
-              "artist": "The Quiz with DJ Trev",
+              "artist": "Quiz with DJ Trev",
               "start": "14:00",
               "end": "17:00"
             },
@@ -803,7 +803,7 @@
               "end": "21:00"
             },
             {
-              "artist": "Mark Archer",
+              "artist": "Mark Archer: 10 years since getting married at Bangface!",
               "start": "21:00",
               "end": "22:00"
             }
