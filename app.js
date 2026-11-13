@@ -667,12 +667,15 @@ function appendCalEvent(colBody, day, stage, set, gridStart, playableIndex = -1)
   const { start, end } = parseSetTimes(day.date, set, stage, playableIndex);
   const topPx = ((start.getTime() - gridStart) / (60 * 60 * 1000)) * CAL_ROW_PX;
   let heightPx = ((end.getTime() - start.getTime()) / (60 * 60 * 1000)) * CAL_ROW_PX;
-  if (set.kind === "closure") heightPx = Math.max(CAL_ROW_PX * 0.85, 34);
+  if (set.kind === "closure") heightPx = Math.max(CAL_ROW_PX - 4, 34);
 
   const event = document.createElement("div");
   event.className = `cal-event${set.kind === "closure" ? " cal-event-closure" : ""}`;
   event.style.top = `${Math.max(0, topPx)}px`;
-  event.style.height = `${Math.max(heightPx, CAL_ROW_PX - 4)}px`;
+  event.style.height = `${heightPx}px`;
+  if (set.kind !== "closure" && heightPx < CAL_ROW_PX) {
+    event.classList.add("cal-event-compact");
+  }
 
   const label = set.kind === "closure" ? set.note || set.artist : set.artist;
   const timeLabel = set.kind === "closure" ? set.start : `${formatTime(start)}–${formatTime(end)}`;

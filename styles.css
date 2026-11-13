@@ -703,6 +703,34 @@ body {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
 }
 
+.cal-event-compact {
+  padding: 1px 0.28rem;
+  padding-right: 1.2rem;
+  gap: 0;
+  justify-content: center;
+}
+
+.cal-event-compact .cal-event-time {
+  font-size: 0.5rem;
+  line-height: 1.05;
+}
+
+.cal-event-compact .cal-event-artist {
+  font-size: 0.58rem;
+  line-height: 1.05;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cal-event-compact .cal-flag {
+  min-width: 1.15rem;
+  min-height: 1.15rem;
+  font-size: 0.7rem;
+  top: 1px;
+  right: 1px;
+}
+
 .cal-flag {
   position: absolute;
   top: 2px;
