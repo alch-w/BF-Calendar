@@ -634,13 +634,87 @@ function setView(name) {
   if (name === "now") renderNow();
 }
 
+function setOfflineBanner(visible) {
+  const banner = document.getElementById("offline-banner");
+  if (!banner) return;
+  banner.classList.toggle("hidden", !visible);
+  banner.hidden = !visible;
+}
+
+function wireOfflineBanner() {
+  const update = () => setOfflineBanner(!navigator.onLine);
+  window.addEventListener("offline", update);
+  window.addEventListener("online", update);
+  update();
+}
+
+async function loadBundledFromCache() {
+  if (!("caches" in window)) return null;
+  const urls = ["./schedule.json", new URL("schedule.json", location.href).href];
+  for (const url of urls) {
+    const res = await caches.match(url);
+    if (!res || !res.ok) continue;
+    const data = /** @type {Schedule} */ (await res.json());
+    const err = validateSchedule(data);
+    if (!err) return { data, fromCache: true };
+  }
+  return null;
+}
+
 async function loadBundled() {
-  const res = await fetch("./schedule.json", { cache: "no-cache" });
-  if (!res.ok) throw new Error("Could not load schedule.json");
-  const data = /** @type {Schedule} */ (await res.json());
+  let fromCacheFallback = false;
+  /** @type {Schedule} */
+  let data;
+
+  try {
+    const res = await fetch("./schedule.json");
+    if (!res.ok) throw new Error("Could not load schedule.json");
+    data = /** @type {Schedule} */ (await res.json());
+  } catch {
+    const cached = await loadBundledFromCache();
+    if (!cached) throw new Error("Could not load schedule.json");
+    data = cached.data;
+    fromCacheFallback = cached.fromCache;
+  }
+
   const err = validateSchedule(data);
   if (err) throw new Error(err);
+
+  if (fromCacheFallback || !navigator.onLine) {
+    setOfflineBanner(true);
+  }
+
   return data;
+}
+
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (window.__swRefreshing) return;
+    window.__swRefreshing = true;
+    window.location.reload();
+  });
+
+  navigator.serviceWorker
+    .register("./sw.js")
+    .then((registration) => {
+      if (registration.waiting) {
+        registration.waiting.postMessage({ type: "SKIP_WAITING" });
+      }
+      registration.addEventListener("updatefound", () => {
+        const worker = registration.installing;
+        if (!worker) return;
+        worker.addEventListener("statechange", () => {
+          if (worker.state === "installed" && navigator.serviceWorker.controller) {
+            worker.postMessage({ type: "SKIP_WAITING" });
+          }
+        });
+      });
+    })
+    .catch((e) => {
+      console.warn("Service worker registration failed", e);
+    });
 }
 
 function clearLegacyScheduleStorage() {
@@ -667,7 +741,9 @@ function wireUi() {
 }
 
 async function init() {
+  registerServiceWorker();
   wireUi();
+  wireOfflineBanner();
   clearLegacyScheduleStorage();
   try {
     schedule = await loadBundled();

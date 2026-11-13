@@ -110,6 +110,15 @@ body {
   border-left: 3px solid var(--accent);
 }
 
+.offline-banner {
+  margin: 0;
+  border-radius: 0;
+  border-left: none;
+  border-bottom: 3px solid var(--accent);
+  text-align: center;
+  font-size: 0.85rem;
+}
+
 .flagged-section {
   margin-bottom: 1rem;
 }
