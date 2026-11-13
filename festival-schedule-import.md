@@ -1,28 +1,28 @@
 # Festival `schedule.json`
 
-The app loads **`festival-calendar/schedule.json` only** (no in-app editor). Edit that file in the project folder, then redeploy or re-upload the app so the phone picks up the new bundle.
+The app loads **`schedule.json` only** (no in-app editor). Edit that file in the repo, then push so Netlify redeploys.
 
-**Flagged sets** are separate: they stay on the device in browser `localStorage` (`festival-flags-v1`) and are not part of this file.
+**Flagged sets** stay on the device in browser `localStorage` (`festival-flags-v1`) and are not part of this file.
 
 ## JSON schema (summary)
 
 | Field | Notes |
 | --- | --- |
-| `festival` | Title string |
+| `festival` | Title string (e.g. `Bang Face`) |
 | `timezone` | e.g. `Europe/London` (organiser reference; **Now** uses the phone clock) |
 | `days[]` | Each day: `id`, `label`, `date` (`YYYY-MM-DD`), `stages[]` |
 | `stages[]` | `id`, `name`, optional `closesAt` / `closureNote`, `sets[]` |
 | `sets[]` | `artist`, `start`, `end` (`HH:MM`); optional `kind: "closure"`, `note` |
 
-**After-midnight** slot times (`00:00`–`05:59`) count as the night after `date` (Friday poster → Saturday morning).
+**After-midnight** slot times (`00:00`–`05:59`) count as the night after `date` (Saturday poster → Sunday morning).
 
-A full Friday lineup lives in the bundled `schedule.json`. Add `days[]` for Saturday/Sunday when ready; empty days are hidden in the UI.
+The bundled `schedule.json` includes **Friday, Saturday, and Sunday** (2026-11-13 — 2026-11-16). The **Schedule** tab shows Fri / Sat / Sun buttons when multiple days have sets; **Now** auto-picks the active festival day from the phone date and clock.
 
 ## Minimal sample
 
 ```json
 {
-  "festival": "My Festival",
+  "festival": "Bang Face",
   "timezone": "Europe/London",
   "days": [
     {
@@ -31,11 +31,10 @@ A full Friday lineup lives in the bundled `schedule.json`. Add `days[]` for Satu
       "date": "2026-11-13",
       "stages": [
         {
-          "id": "main",
-          "name": "Main Room",
+          "id": "bang-room",
+          "name": "Bang",
           "sets": [
-            { "artist": "Opening DJ", "start": "18:00", "end": "19:00" },
-            { "artist": "Headliner", "start": "21:00", "end": "23:00" }
+            { "artist": "Opening DJ", "start": "18:00", "end": "19:00" }
           ]
         }
       ]

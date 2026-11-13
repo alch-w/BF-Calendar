@@ -1,15 +1,15 @@
 {
-  "name": "My Festival Schedule",
-  "short_name": "Festival",
-  "description": "Mobile festival schedule — Now, by day, and by stage.",
+  "name": "Bang Face",
+  "short_name": "Bang Face",
+  "description": "Bang Face weekend — Now, schedule grid, and flags.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0f0f12",
-  "theme_color": "#7c5cff",
+  "background_color": "#000000",
+  "theme_color": "#e10600",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%237c5cff' width='512' height='512' rx='96'/%3E%3Ctext x='256' y='300' text-anchor='middle' font-size='200' fill='white' font-family='system-ui'%3EF%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%23e10600' width='512' height='512' rx='96'/%3E%3Ctext x='256' y='300' text-anchor='middle' font-size='180' fill='white' font-family='system-ui' font-weight='bold'%3EBF%3C/text%3E%3C/svg%3E",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any"

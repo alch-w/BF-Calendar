@@ -1,14 +1,16 @@
 :root {
-  --bg: #0f0f12;
-  --surface: #1a1a22;
-  --surface-2: #24242f;
-  --text: #f4f4f7;
-  --muted: #9b9bab;
-  --accent: #7c5cff;
-  --accent-dim: rgba(124, 92, 255, 0.2);
-  --now: #3dd68c;
-  --next: #ffb347;
-  --radius: 12px;
+  --bg: #000000;
+  --surface: #0c0c0c;
+  --surface-2: #141414;
+  --text: #ffffff;
+  --muted: #b3b3b3;
+  --accent: #e10600;
+  --accent-dim: rgba(225, 6, 0, 0.22);
+  --accent-border: rgba(225, 6, 0, 0.55);
+  --grid-line: rgba(225, 6, 0, 0.28);
+  --now: #ff3333;
+  --next: #ff6666;
+  --radius: 8px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --cal-row-px: 44px;
   --cal-col-w: 6.75rem;
@@ -43,15 +45,19 @@ body {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: linear-gradient(var(--bg) 70%, transparent);
+  background: linear-gradient(var(--bg) 85%, transparent);
   padding: max(0.75rem, env(safe-area-inset-top)) 1rem 0.5rem;
+  border-bottom: 1px solid var(--accent-border);
 }
 
 .brand h1 {
   margin: 0;
-  font-size: 1.35rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-family: "Arial Narrow", "Franklin Gothic Medium", "Segoe UI", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
 }
 
 .context-line {
@@ -65,7 +71,8 @@ body {
   gap: 0.35rem;
   background: var(--surface);
   padding: 0.25rem;
-  border-radius: 999px;
+  border-radius: 4px;
+  border: 1px solid var(--grid-line);
 }
 
 .tab {
@@ -75,9 +82,11 @@ body {
   color: var(--muted);
   font: inherit;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   padding: 0.55rem 0.5rem;
-  border-radius: 999px;
+  border-radius: 2px;
   cursor: pointer;
 }
 
@@ -109,9 +118,9 @@ body {
   margin: 0 0 0.5rem;
   font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  font-weight: 800;
 }
 
 .flagged-empty {
@@ -136,7 +145,7 @@ body {
   gap: 0.5rem 0.65rem;
   align-items: start;
   background: var(--surface);
-  border: 1px solid rgba(255, 179, 71, 0.25);
+  border: 1px solid var(--accent-border);
   border-radius: var(--radius);
   padding: 0.55rem 0.65rem;
 }
@@ -145,7 +154,7 @@ body {
   font-size: 0.72rem;
   color: var(--next);
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.35;
 }
 
@@ -160,7 +169,8 @@ body {
   font-size: 0.68rem;
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
+  font-weight: 700;
 }
 
 .flagged-artist {
@@ -180,15 +190,17 @@ body {
   background: var(--surface);
   border-radius: var(--radius);
   padding: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--grid-line);
 }
 
 .stage-card h3 {
   margin: 0 0 0.75rem;
-  font-size: 0.8rem;
+  font-family: "Arial Narrow", "Franklin Gothic Medium", sans-serif;
+  font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--muted);
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-weight: 800;
 }
 
 .slot {
@@ -197,7 +209,7 @@ body {
   gap: 0.5rem 0.75rem;
   align-items: start;
   padding: 0.5rem 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--grid-line);
 }
 
 .slot:first-of-type {
@@ -212,7 +224,7 @@ body {
 }
 
 .slot .artist {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1rem;
 }
 
@@ -227,22 +239,24 @@ body {
 .badge {
   display: inline-block;
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   padding: 0.15rem 0.4rem;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-bottom: 0.2rem;
 }
 
 .badge.live {
-  background: rgba(61, 214, 140, 0.2);
+  background: var(--accent-dim);
   color: var(--now);
+  border: 1px solid var(--accent-border);
 }
 
 .badge.upnext {
-  background: rgba(255, 179, 71, 0.2);
+  background: rgba(255, 102, 102, 0.15);
   color: var(--next);
+  border: 1px solid rgba(255, 102, 102, 0.35);
 }
 
 .badge.idle {
@@ -258,11 +272,13 @@ body {
 
 .day-btn {
   flex: 1;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--grid-line);
   background: var(--surface);
   color: var(--text);
   font: inherit;
-  font-weight: 600;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   padding: 0.65rem;
   border-radius: var(--radius);
   cursor: pointer;
@@ -270,7 +286,7 @@ body {
 
 .day-btn.active {
   border-color: var(--accent);
-  background: var(--accent-dim);
+  background: var(--accent);
   color: #fff;
 }
 
@@ -289,6 +305,8 @@ body {
   margin: 0 1rem 0.5rem;
   font-size: 0.75rem;
   color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .cal-scroll-wrap {
@@ -326,12 +344,12 @@ body {
 
 .cal-gutter {
   min-height: 2.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid var(--grid-line);
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.5);
 }
 
 .cal-times-col {
-  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.5);
 }
 
 .cal-head-cols,
@@ -353,13 +371,14 @@ body {
 
 .cal-stage-head {
   background: var(--surface);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 2px solid var(--accent);
+  border-right: 1px solid var(--grid-line);
   padding: 0.45rem 0.35rem;
-  font-size: 0.68rem;
-  font-weight: 700;
+  font-family: "Arial Narrow", "Franklin Gothic Medium", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   line-height: 1.2;
   text-align: center;
   min-height: 2.75rem;
@@ -368,18 +387,19 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.15rem;
+  color: var(--text);
 }
 
 .cal-stage-close {
   font-size: 0.62rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--muted);
   text-transform: none;
   letter-spacing: 0;
 }
 
 .cal-time {
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid var(--grid-line);
   font-size: 0.68rem;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
@@ -391,22 +411,22 @@ body {
 
 .cal-time-now {
   color: var(--now);
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .cal-col-body {
   position: relative;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid var(--grid-line);
   background: rgba(255, 255, 255, 0.02);
 }
 
 .cal-row-line {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--grid-line);
   pointer-events: none;
 }
 
 .cal-row-line-now {
-  background: rgba(61, 214, 140, 0.06);
+  background: rgba(225, 6, 0, 0.1);
 }
 
 .cal-event {
@@ -416,9 +436,9 @@ body {
   z-index: 2;
   padding: 0.2rem 0.28rem;
   padding-right: 1.55rem;
-  border-radius: 6px;
+  border-radius: 4px;
   background: var(--accent-dim);
-  border: 1px solid rgba(124, 92, 255, 0.35);
+  border: 1px solid var(--accent-border);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -427,8 +447,8 @@ body {
 }
 
 .cal-event-flagged {
-  border-color: rgba(255, 179, 71, 0.55);
-  box-shadow: inset 0 0 0 1px rgba(255, 179, 71, 0.2);
+  border-color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
 }
 
 .cal-flag {
@@ -439,8 +459,8 @@ body {
   min-height: 2rem;
   padding: 0;
   border: none;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.55);
   color: var(--muted);
   font-size: 1rem;
   line-height: 1;
@@ -452,7 +472,7 @@ body {
 }
 
 .cal-flag.is-flagged {
-  color: var(--next);
+  color: #fff;
 }
 
 .cal-flag:active {
@@ -468,21 +488,21 @@ body {
 
 .cal-event-artist {
   font-size: 0.67rem;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
 
 .cal-event-closure {
   padding-right: 0.28rem;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.04);
   border-style: dashed;
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--muted);
   z-index: 1;
 }
 
 .cal-event-closure .cal-event-artist {
-  font-weight: 500;
+  font-weight: 600;
   font-style: italic;
   color: var(--muted);
   font-size: 0.62rem;
@@ -494,10 +514,10 @@ body {
   right: 0;
   height: 2px;
   background: var(--now);
-  opacity: 0.85;
+  opacity: 0.95;
   z-index: 5;
   pointer-events: none;
-  box-shadow: 0 0 8px rgba(61, 214, 140, 0.45);
+  box-shadow: 0 0 10px rgba(225, 6, 0, 0.75);
 }
 
 .muted-text {
@@ -519,7 +539,7 @@ body {
 
 @media (min-width: 480px) {
   .brand h1 {
-    font-size: 1.5rem;
+    font-size: 1.65rem;
   }
 
   :root {
