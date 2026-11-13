@@ -14,6 +14,10 @@
     <div id="offline-banner" class="banner offline-banner hidden" role="status" aria-live="polite">
       Offline — showing the last saved schedule.
     </div>
+    <div id="load-error" class="banner load-error hidden" role="alert" aria-live="assertive">
+      <p id="load-error-text" class="load-error-text">Could not load schedule.</p>
+      <button type="button" id="load-error-retry" class="load-error-retry">Retry</button>
+    </div>
     <header class="app-header">
       <button type="button" id="rabbit-egg-btn" class="rabbit-egg-btn" aria-label="Rabbit rain">
         <span class="rabbit-egg-icon" aria-hidden="true">🐰</span>
