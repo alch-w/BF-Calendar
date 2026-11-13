@@ -1,6 +1,7 @@
 {
   "festival": "Bang Face",
   "timezone": "Europe/London",
+  "notes": "Sets starting 00:00-05:00 belong to the festival day listed, but fall on the next calendar date. Skyline ends are inferred from the next start. Final-set ends after 04:00 are assumed +1h.",
   "days": [
     {
       "id": "friday",
@@ -9,137 +10,45 @@
       "stages": [
         {
           "id": "bang-room",
-          "name": "Bang",
+          "name": "Bang Room",
           "closesAt": "02:00",
-          "closureNote": "Bang Room closes 2am \u2014 head to the other rooms!",
+          "closureNote": "Bang Room closes 2am — head to the other rooms!",
           "sets": [
-            {
-              "artist": "Dave Skywalker",
-              "start": "19:00",
-              "end": "20:00"
-            },
-            {
-              "artist": "Opening Ceremony",
-              "start": "20:00",
-              "end": "21:00"
-            },
-            {
-              "artist": "Dick & Dom",
-              "start": "21:00",
-              "end": "22:00"
-            },
-            {
-              "artist": "Mandidextrous",
-              "start": "22:00",
-              "end": "23:00"
-            },
-            {
-              "artist": "A.N.I.",
-              "start": "23:00",
-              "end": "00:00"
-            },
-            {
-              "artist": "Russian Village Boys",
-              "start": "00:00",
-              "end": "01:00"
-            },
-            {
-              "artist": "Jowi",
-              "start": "01:00",
-              "end": "02:00"
-            }
+            {"artist": "Dave Skywalker", "start": "19:00", "end": "20:00"},
+            {"artist": "Opening Ceremony", "start": "20:00", "end": "21:00"},
+            {"artist": "Dick & Dom", "start": "21:00", "end": "22:00"},
+            {"artist": "Mandidextrous", "start": "22:00", "end": "23:00"},
+            {"artist": "A.N.I.", "start": "23:00", "end": "00:00"},
+            {"artist": "Russian Village Boys", "start": "00:00", "end": "01:00"},
+            {"artist": "Jowi", "start": "01:00", "end": "02:00"}
           ]
         },
         {
           "id": "face-room",
-          "name": "Face",
+          "name": "Face Room",
           "sets": [
-            {
-              "artist": "Sample Junkie",
-              "start": "20:00",
-              "end": "21:00"
-            },
-            {
-              "artist": "Ushko",
-              "start": "21:00",
-              "end": "22:00"
-            },
-            {
-              "artist": "Umru",
-              "start": "22:00",
-              "end": "23:00"
-            },
-            {
-              "artist": "I. Jordan",
-              "start": "23:00",
-              "end": "00:00"
-            },
-            {
-              "artist": "Eris Drew & Octo Octa",
-              "start": "00:00",
-              "end": "02:00"
-            },
-            {
-              "artist": "Tanukichi",
-              "start": "02:00",
-              "end": "03:00"
-            },
-            {
-              "artist": "Floxytek",
-              "start": "03:00",
-              "end": "04:00"
-            },
-            {
-              "artist": "Dolphin",
-              "start": "04:00",
-              "end": "05:00"
-            }
+            {"artist": "Sample Junkie", "start": "20:00", "end": "21:00"},
+            {"artist": "Ushko", "start": "21:00", "end": "22:00"},
+            {"artist": "Umru", "start": "22:00", "end": "23:00"},
+            {"artist": "I. Jordan", "start": "23:00", "end": "00:00"},
+            {"artist": "Eris Drew & Octo Octa", "start": "00:00", "end": "02:00"},
+            {"artist": "Tanukichi", "start": "02:00", "end": "03:00"},
+            {"artist": "Floxytek", "start": "03:00", "end": "04:00"},
+            {"artist": "Dolphin", "start": "04:00", "end": "05:00"}
           ]
         },
         {
           "id": "hard-crew",
           "name": "Hard Crew",
           "sets": [
-            {
-              "artist": "Robyn Chaos",
-              "start": "20:00",
-              "end": "21:00"
-            },
-            {
-              "artist": "Jason Forrest",
-              "start": "21:00",
-              "end": "22:00"
-            },
-            {
-              "artist": "Nero's Day at Disneyland",
-              "start": "22:00",
-              "end": "23:00"
-            },
-            {
-              "artist": "Goreshit",
-              "start": "23:00",
-              "end": "00:00"
-            },
-            {
-              "artist": "FFF",
-              "start": "00:00",
-              "end": "01:00"
-            },
-            {
-              "artist": "Dev/Null",
-              "start": "01:00",
-              "end": "02:00"
-            },
-            {
-              "artist": "Bizzy B",
-              "start": "02:00",
-              "end": "03:00"
-            },
-            {
-              "artist": "Tim Reaper & Dwarde",
-              "start": "03:00",
-              "end": "04:00"
-            }
+            {"artist": "Robyn Chaos", "start": "20:00", "end": "21:00"},
+            {"artist": "Jason Forrest", "start": "21:00", "end": "22:00"},
+            {"artist": "Nero's Day at Disneyland", "start": "22:00", "end": "23:00"},
+            {"artist": "Goreshit", "start": "23:00", "end": "00:00"},
+            {"artist": "FFF", "start": "00:00", "end": "01:00"},
+            {"artist": "Dev/Null", "start": "01:00", "end": "02:00"},
+            {"artist": "Bizzy B", "start": "02:00", "end": "03:00"},
+            {"artist": "Tim Reaper & Dwarde", "start": "03:00", "end": "04:00"}
           ]
         },
         {
@@ -147,84 +56,32 @@
           "name": "Hotshots",
           "closesAt": "04:00",
           "sets": [
-            {
-              "artist": "Chipmunk Spunk",
-              "start": "18:00",
-              "end": "19:00"
-            },
-            {
-              "artist": "BreezyC",
-              "start": "19:00",
-              "end": "20:00"
-            },
-            {
-              "artist": "Otto Vlotto",
-              "start": "20:00",
-              "end": "21:00"
-            },
-            {
-              "artist": "Misstress Virgyn",
-              "start": "21:00",
-              "end": "22:00"
-            },
-            {
-              "artist": "Lotus Phaze",
-              "start": "22:00",
-              "end": "23:00"
-            },
-            {
-              "artist": "Light Gal",
-              "start": "23:00",
-              "end": "00:00"
-            },
-            {
-              "artist": "DJ Osu!",
-              "start": "00:00",
-              "end": "01:00"
-            },
-            {
-              "artist": "Slayphex Twins",
-              "start": "01:00",
-              "end": "02:00"
-            },
-            {
-              "artist": "Gupi",
-              "start": "02:00",
-              "end": "03:00"
-            },
-            {
-              "artist": "Emily Knight",
-              "start": "03:00",
-              "end": "04:00"
-            }
+            {"artist": "Chipmunk Spunk", "start": "18:00", "end": "19:00"},
+            {"artist": "BreezyC", "start": "19:00", "end": "20:00"},
+            {"artist": "Otto Vlotto", "start": "20:00", "end": "21:00"},
+            {"artist": "Misstress Virgyn", "start": "21:00", "end": "22:00"},
+            {"artist": "Lotus Phaze", "start": "22:00", "end": "23:00"},
+            {"artist": "Light Gal", "start": "23:00", "end": "00:00"},
+            {"artist": "DJ Osu!", "start": "00:00", "end": "01:00"},
+            {"artist": "Slayphex Twins", "start": "01:00", "end": "02:00"},
+            {"artist": "Gupi", "start": "02:00", "end": "03:00"},
+            {"artist": "Emily Knight", "start": "03:00", "end": "04:00"}
           ]
         },
         {
           "id": "skyline",
           "name": "Skyline",
           "sets": [
-            {
-              "artist": "DJ Trev Welcome Set",
-              "start": "14:00",
-              "end": "16:00"
-            },
-            {
-              "artist": "Half East Records (Ting Run Run, Kuya Betas, Bejeebe, Tirta)",
-              "start": "16:00",
-              "end": "20:00"
-            },
-            {
-              "artist": "Wrong Music",
-              "start": "20:00",
-              "end": "22:00"
-            },
-            {
-              "artist": "Dogshow",
-              "start": "22:00",
-              "end": "23:30"
-            }
+            {"artist": "DJ Trev (Welcome Set)", "start": "14:00", "end": "16:00"},
+            {"artist": "Half East Records (Ting Run Run, Kuya Betas, Bejeebe, Tirta)", "start": "16:00", "end": "20:00"},
+            {"artist": "Wrong Music", "start": "20:00", "end": "22:00"},
+            {"artist": "Dogshow", "start": "22:00", "end": null}
           ]
         }
+      ],
+      "extras": [
+        {"name": "Cinema Bang Face (BFTV reimagined, 2 screens)", "start": "21:00", "end": "03:00"},
+        {"name": "Opening Ceremony", "location": "Bang Room", "start": "20:00", "end": "21:00"}
       ]
     },
     {
@@ -234,295 +91,99 @@
       "stages": [
         {
           "id": "bang-room",
-          "name": "Bang",
+          "name": "Bang Room",
           "closesAt": "02:00",
-          "closureNote": "Bang closes 2am \u2014 head to the other rooms!",
+          "closureNote": "Bang Room closes 2am — head to the other rooms!",
           "sets": [
-            {
-              "artist": "Shadesy & P-Hocto",
-              "start": "17:00",
-              "end": "19:00"
-            },
-            {
-              "artist": "The Liberators",
-              "start": "19:00",
-              "end": "21:00"
-            },
-            {
-              "artist": "Otto Von Schirach",
-              "start": "21:00",
-              "end": "22:00"
-            },
-            {
-              "artist": "Igorrr",
-              "start": "22:00",
-              "end": "23:00"
-            },
-            {
-              "artist": "Sherelle",
-              "start": "23:00",
-              "end": "00:00"
-            },
-            {
-              "artist": "Mad Dog",
-              "start": "00:00",
-              "end": "01:00"
-            },
-            {
-              "artist": "Hysta",
-              "start": "01:00",
-              "end": "02:00"
-            },
-            {
-              "kind": "closure",
-              "artist": "Bang closed",
-              "start": "02:00",
-              "end": "02:00",
-              "note": "Bang closes 2am"
-            }
+            {"artist": "Shadesy & P-Hocto", "start": "17:00", "end": "18:00"},
+            {"artist": "The Liberators", "start": "18:00", "end": "20:00"},
+            {"artist": "Otto Von Schirach", "start": "20:00", "end": "21:00"},
+            {"artist": "Igorrr", "start": "21:00", "end": "23:00"},
+            {"artist": "Sherelle", "start": "23:00", "end": "00:00"},
+            {"artist": "Mad Dog", "start": "00:00", "end": "01:00"},
+            {"artist": "Hysta", "start": "01:00", "end": "02:00"}
           ]
         },
         {
           "id": "face-room",
-          "name": "Face",
+          "name": "Face Room",
           "sets": [
-            {
-              "artist": "Ben XO",
-              "start": "17:00",
-              "end": "18:00"
-            },
-            {
-              "artist": "Breakforce One",
-              "start": "18:00",
-              "end": "19:00"
-            },
-            {
-              "artist": "Pinks",
-              "start": "19:00",
-              "end": "20:00"
-            },
-            {
-              "artist": "Burt Cope",
-              "start": "20:00",
-              "end": "21:00"
-            },
-            {
-              "artist": "Kara",
-              "start": "21:00",
-              "end": "22:00"
-            },
-            {
-              "artist": "DJ Bax",
-              "start": "22:00",
-              "end": "23:00"
-            },
-            {
-              "artist": "Kampire",
-              "start": "23:00",
-              "end": "00:00"
-            },
-            {
-              "artist": "Hiroko Yamamura",
-              "start": "00:00",
-              "end": "01:00"
-            },
-            {
-              "artist": "John B",
-              "start": "01:00",
-              "end": "02:00"
-            },
-            {
-              "artist": "Current Value",
-              "start": "02:00",
-              "end": "03:00"
-            },
-            {
-              "artist": "Prolix",
-              "start": "03:00",
-              "end": "04:00"
-            },
-            {
-              "artist": "Insideinfo",
-              "start": "04:00",
-              "end": "05:00"
-            }
+            {"artist": "Ben XO", "start": "17:00", "end": "18:00"},
+            {"artist": "Breakforce One", "start": "18:00", "end": "19:00"},
+            {"artist": "Pinks", "start": "19:00", "end": "20:00"},
+            {"artist": "Burt Cope", "start": "20:00", "end": "21:00"},
+            {"artist": "Kara", "start": "21:00", "end": "22:00"},
+            {"artist": "DJ Bax", "start": "22:00", "end": "23:00"},
+            {"artist": "Kampire", "start": "23:00", "end": "00:00"},
+            {"artist": "Hiroko Yamamura", "start": "00:00", "end": "01:00"},
+            {"artist": "John B", "start": "01:00", "end": "02:00"},
+            {"artist": "Current Value", "start": "02:00", "end": "03:00"},
+            {"artist": "Prolix", "start": "03:00", "end": "04:00"},
+            {"artist": "Insideinfo", "start": "04:00", "end": "05:00"}
           ]
         },
         {
           "id": "hard-crew",
           "name": "Hard Crew",
           "sets": [
-            {
-              "artist": "Rory K",
-              "start": "17:00",
-              "end": "18:00"
-            },
-            {
-              "artist": "2Peng",
-              "start": "18:00",
-              "end": "19:00"
-            },
-            {
-              "artist": "Boxxy",
-              "start": "19:00",
-              "end": "20:00"
-            },
-            {
-              "artist": "Hang the DJs",
-              "start": "20:00",
-              "end": "21:00"
-            },
-            {
-              "artist": "Dougal",
-              "start": "21:00",
-              "end": "22:00"
-            },
-            {
-              "artist": "DJ Sarah Bonito",
-              "start": "22:00",
-              "end": "23:00"
-            },
-            {
-              "artist": "Scott Brown",
-              "start": "23:00",
-              "end": "00:00"
-            },
-            {
-              "artist": "The Berzerker (DJ)",
-              "start": "00:00",
-              "end": "01:00"
-            },
-            {
-              "artist": "GPF",
-              "start": "01:00",
-              "end": "02:00"
-            },
-            {
-              "artist": "Machine Girl",
-              "start": "02:00",
-              "end": "03:00"
-            },
-            {
-              "artist": "Mollie Rush",
-              "start": "03:00",
-              "end": "04:00"
-            },
-            {
-              "artist": "Deathmachine",
-              "start": "04:00",
-              "end": "05:00"
-            }
+            {"artist": "Rory K", "start": "17:00", "end": "18:00"},
+            {"artist": "2Peng", "start": "18:00", "end": "19:00"},
+            {"artist": "Boxxy", "start": "19:00", "end": "20:00"},
+            {"artist": "Hang the DJs", "start": "20:00", "end": "21:00"},
+            {"artist": "Dougal", "start": "21:00", "end": "22:00"},
+            {"artist": "DJ Sarah Bonito", "start": "22:00", "end": "23:00"},
+            {"artist": "Scott Brown", "start": "23:00", "end": "00:00"},
+            {"artist": "The Berzerker (DJ)", "start": "00:00", "end": "01:00"},
+            {"artist": "GPF", "start": "01:00", "end": "02:00"},
+            {"artist": "Machine Girl", "start": "02:00", "end": "03:00"},
+            {"artist": "Mollie Rush", "start": "03:00", "end": "04:00"},
+            {"artist": "Deathmachine", "start": "04:00", "end": "05:00"}
           ]
         },
         {
           "id": "hotshots",
           "name": "Hotshots",
           "closesAt": "04:00",
-          "closureNote": "Hotshots closes 4am",
           "sets": [
-            {
-              "artist": "Yeahhbuzz",
-              "start": "15:00",
-              "end": "16:00"
-            },
-            {
-              "artist": "Team GB",
-              "start": "16:00",
-              "end": "17:00"
-            },
-            {
-              "artist": "Jakazid",
-              "start": "17:00",
-              "end": "18:00"
-            },
-            {
-              "artist": "DJ Evo",
-              "start": "18:00",
-              "end": "19:00"
-            },
-            {
-              "artist": "M-Rei",
-              "start": "19:00",
-              "end": "20:00"
-            },
-            {
-              "artist": "Ectomorph",
-              "start": "20:00",
-              "end": "21:00"
-            },
-            {
-              "artist": "Jack in Box",
-              "start": "21:00",
-              "end": "22:00"
-            },
-            {
-              "artist": "CLSM",
-              "start": "22:00",
-              "end": "23:00"
-            },
-            {
-              "artist": "Fracus & Darwin",
-              "start": "23:00",
-              "end": "00:00"
-            },
-            {
-              "artist": "Aerbreak",
-              "start": "00:00",
-              "end": "01:00"
-            },
-            {
-              "artist": "Alzoc III",
-              "start": "01:00",
-              "end": "02:00"
-            },
-            {
-              "artist": "Syran",
-              "start": "02:00",
-              "end": "03:00"
-            },
-            {
-              "artist": "Sensi",
-              "start": "03:00",
-              "end": "04:00"
-            }
+            {"artist": "Yeahhbuzz", "start": "15:00", "end": "16:00"},
+            {"artist": "Team GB", "start": "16:00", "end": "17:00"},
+            {"artist": "Jakazid", "start": "17:00", "end": "18:00"},
+            {"artist": "DJ Evo", "start": "18:00", "end": "19:00"},
+            {"artist": "M-Rei", "start": "19:00", "end": "20:00"},
+            {"artist": "Ectomorph", "start": "20:00", "end": "21:00"},
+            {"artist": "Jack in Box", "start": "21:00", "end": "22:00"},
+            {"artist": "CLSM", "start": "22:00", "end": "23:00"},
+            {"artist": "Fracus & Darwin", "start": "23:00", "end": "00:00"},
+            {"artist": "Aerbreak", "start": "00:00", "end": "01:00"},
+            {"artist": "Alzoc III", "start": "01:00", "end": "02:00"},
+            {"artist": "Syran", "start": "02:00", "end": "03:00"},
+            {"artist": "Sensi", "start": "03:00", "end": "04:00"}
           ]
         },
         {
           "id": "skyline",
           "name": "Skyline",
           "sets": [
-            {
-              "artist": "Doomscroll",
-              "start": "13:00",
-              "end": "16:00"
-            },
-            {
-              "artist": "Party Science",
-              "start": "16:00",
-              "end": "19:30"
-            },
-            {
-              "artist": "Judith Priest",
-              "start": "19:30",
-              "end": "20:00"
-            },
-            {
-              "artist": "Spinee",
-              "start": "20:00",
-              "end": "21:00"
-            },
-            {
-              "artist": "GFOTY",
-              "start": "21:00",
-              "end": "22:00"
-            },
-            {
-              "artist": "Shitmat",
-              "start": "22:00",
-              "end": "23:00"
-            }
+            {"artist": "Doomscroll", "start": "13:00", "end": "16:00"},
+            {"artist": "Party Science", "start": "16:00", "end": "19:30"},
+            {"artist": "Judith Priest", "start": "19:30", "end": "20:00"},
+            {"artist": "Spinee", "start": "20:00", "end": "21:00"},
+            {"artist": "GFOTY", "start": "21:00", "end": "22:00"},
+            {"artist": "Shitmat", "start": "22:00", "end": null}
           ]
         }
+      ],
+      "extras": [
+        {"name": "Pool Party signup", "location": "Skyline Rep Office", "start": "11:30", "end": null},
+        {"name": "Pool Party 1: Pete Cannon + Scott Brown", "start": "12:30", "end": "14:15"},
+        {"name": "Pool Party 2: Mandidextrous + Denis the Menis", "start": "15:00", "end": "16:45"},
+        {"name": "Pool Party 3: DJ Sarah Bonito + Dolphin & Li-Z", "start": "17:30", "end": "19:15"},
+        {"name": "Cinema Bang Face", "start": "21:00", "end": "03:00"},
+        {"name": "Laser Tag", "start": "15:00", "end": "18:00"},
+        {"name": "Free Fairground", "start": "15:00", "end": "18:00"},
+        {"name": "Bowling", "start": "14:00", "end": "20:00"},
+        {"name": "Beach Gate", "start": "10:00", "end": "16:00"},
+        {"name": "Arcade", "start": "12:00", "end": null}
       ]
     },
     {
@@ -532,283 +193,91 @@
       "stages": [
         {
           "id": "bang-room",
-          "name": "Bang",
+          "name": "Bang Room",
           "sets": [
-            {
-              "artist": "\u2014",
-              "start": "13:00",
-              "end": "14:00"
-            },
-            {
-              "artist": "\u2014",
-              "start": "14:00",
-              "end": "15:00"
-            },
-            {
-              "artist": "\u2014",
-              "start": "15:00",
-              "end": "16:00"
-            },
-            {
-              "artist": "Brain Rays & Quiet",
-              "start": "16:00",
-              "end": "17:00"
-            },
-            {
-              "artist": "Luke Vibert",
-              "start": "17:00",
-              "end": "18:00"
-            },
-            {
-              "artist": "Iglooghost",
-              "start": "18:00",
-              "end": "19:00"
-            },
-            {
-              "artist": "Photek",
-              "start": "19:00",
-              "end": "20:00"
-            },
-            {
-              "artist": "G Jones & EPROM",
-              "start": "20:00",
-              "end": "22:00"
-            },
-            {
-              "artist": "Clark",
-              "start": "22:00",
-              "end": "23:00"
-            },
-            {
-              "artist": "Closing Party: Saint Acid & The Bang Face Hard Crew",
-              "start": "23:00",
-              "end": "01:00"
-            }
+            {"artist": "Brain Rays & Quiet", "start": "16:00", "end": "17:00"},
+            {"artist": "Luke Vibert", "start": "17:00", "end": "18:00"},
+            {"artist": "Iglooghost", "start": "18:00", "end": "19:00"},
+            {"artist": "Photek", "start": "19:00", "end": "20:00"},
+            {"artist": "G Jones & Eprom", "start": "20:00", "end": "22:00"},
+            {"artist": "Clark", "start": "22:00", "end": "23:00"},
+            {"artist": "Saint Acid & The Bang Face Hard Crew (Closing Party)", "start": "23:00", "end": "01:00"}
           ]
         },
         {
           "id": "face-room",
-          "name": "Face",
+          "name": "Face Room",
+          "notes": "Hardcore Energy 16:00-01:00",
           "sets": [
-            {
-              "artist": "Cosmic Turtle (2025 Winner)",
-              "start": "13:00",
-              "end": "15:00"
-            },
-            {
-              "artist": "Hard Crew vote slot",
-              "start": "15:00",
-              "end": "16:00"
-            },
-            {
-              "artist": "2Quid",
-              "start": "16:00",
-              "end": "17:00"
-            },
-            {
-              "artist": "Krym",
-              "start": "17:00",
-              "end": "18:00"
-            },
-            {
-              "artist": "Bruk",
-              "start": "18:00",
-              "end": "19:00"
-            },
-            {
-              "artist": "DJ Hybrid",
-              "start": "19:00",
-              "end": "20:00"
-            },
-            {
-              "artist": "Cheff the Boy",
-              "start": "20:00",
-              "end": "21:00"
-            },
-            {
-              "artist": "Time to Rush",
-              "start": "21:00",
-              "end": "22:00"
-            },
-            {
-              "artist": "Hypersh\u00e9",
-              "start": "22:00",
-              "end": "23:00"
-            },
-            {
-              "artist": "Silva Snipa",
-              "start": "23:00",
-              "end": "00:00"
-            },
-            {
-              "artist": "Origin8a & Propa",
-              "start": "00:00",
-              "end": "01:00"
-            }
+            {"artist": "Cosmic Turtle (2025 winner, voted by the Hard Crew)", "start": "13:00", "end": "16:00"},
+            {"artist": "2Quid", "start": "16:00", "end": "17:00"},
+            {"artist": "Krym", "start": "17:00", "end": "18:00"},
+            {"artist": "Bruk", "start": "18:00", "end": "19:00"},
+            {"artist": "DJ Hybrid", "start": "19:00", "end": "20:00"},
+            {"artist": "Cheff the Boy", "start": "20:00", "end": "21:00"},
+            {"artist": "Time to Rush", "start": "21:00", "end": "22:00"},
+            {"artist": "Hypershé", "start": "22:00", "end": "23:00"},
+            {"artist": "Silva Snipa", "start": "23:00", "end": "00:00"},
+            {"artist": "Origin8a & Propa", "start": "00:00", "end": "01:00"}
           ]
         },
         {
           "id": "hard-crew",
           "name": "Hard Crew",
+          "notes": "Off Me Nut 13:00-19:00",
           "sets": [
-            {
-              "artist": "Yanny",
-              "start": "13:00",
-              "end": "14:00"
-            },
-            {
-              "artist": "Venz",
-              "start": "14:00",
-              "end": "15:00"
-            },
-            {
-              "artist": "Shirley Temper",
-              "start": "15:00",
-              "end": "16:00"
-            },
-            {
-              "artist": "300SkullsAndCounting & Jenny Sparks",
-              "start": "16:00",
-              "end": "17:00"
-            },
-            {
-              "artist": "Phatworld",
-              "start": "17:00",
-              "end": "18:00"
-            },
-            {
-              "artist": "Spongebob Squarewave",
-              "start": "18:00",
-              "end": "19:00"
-            },
-            {
-              "artist": "DJ Can't Say No",
-              "start": "19:00",
-              "end": "20:00"
-            },
-            {
-              "artist": "Ceephax Acid Crew",
-              "start": "20:00",
-              "end": "21:00"
-            },
-            {
-              "artist": "Krista Bourgeois",
-              "start": "21:00",
-              "end": "22:00"
-            },
-            {
-              "artist": "The DJ Producer",
-              "start": "22:00",
-              "end": "23:00"
-            },
-            {
-              "artist": "Hellfish & Akira",
-              "start": "23:00",
-              "end": "01:00"
-            }
+            {"artist": "Yanny", "start": "13:00", "end": "14:00"},
+            {"artist": "Venz", "start": "14:00", "end": "15:00"},
+            {"artist": "Shirley Temper", "start": "15:00", "end": "16:00"},
+            {"artist": "300SkullsAndCounting & Jenny Sparks", "start": "16:00", "end": "17:00"},
+            {"artist": "Phatworld", "start": "17:00", "end": "18:00"},
+            {"artist": "Spongebob Squarewave", "start": "18:00", "end": "19:00"},
+            {"artist": "DJ Can't Say No", "start": "19:00", "end": "20:00"},
+            {"artist": "Ceephax Acid Crew", "start": "20:00", "end": "21:00"},
+            {"artist": "Krista Bourgeois", "start": "21:00", "end": "22:00"},
+            {"artist": "The DJ Producer", "start": "22:00", "end": "23:00"},
+            {"artist": "Hellfish & Akira", "start": "23:00", "end": "01:00"}
           ]
         },
         {
           "id": "hotshots",
           "name": "Hotshots",
           "closesAt": "23:00",
-          "closureNote": "Hotshots closes 11pm",
           "sets": [
-            {
-              "artist": "DJ Ar",
-              "start": "13:00",
-              "end": "14:00"
-            },
-            {
-              "artist": "Slinki",
-              "start": "14:00",
-              "end": "15:00"
-            },
-            {
-              "artist": "Ac1d Vicious",
-              "start": "15:00",
-              "end": "16:00"
-            },
-            {
-              "artist": "DJ Cries In Spanish",
-              "start": "16:00",
-              "end": "17:00"
-            },
-            {
-              "artist": "Koarse",
-              "start": "17:00",
-              "end": "18:00"
-            },
-            {
-              "artist": "JmDasha",
-              "start": "18:00",
-              "end": "19:00"
-            },
-            {
-              "artist": "Chy",
-              "start": "19:00",
-              "end": "20:00"
-            },
-            {
-              "artist": "Phia Sky",
-              "start": "20:00",
-              "end": "21:00"
-            },
-            {
-              "artist": "Keptek",
-              "start": "21:00",
-              "end": "22:00"
-            },
-            {
-              "artist": "Kitsch",
-              "start": "22:00",
-              "end": "23:00"
-            },
-            {
-              "kind": "closure",
-              "artist": "Hotshots closed",
-              "start": "23:00",
-              "end": "23:00",
-              "note": "Hotshots closes 11pm"
-            }
+            {"artist": "DJ AR", "start": "13:00", "end": "14:00"},
+            {"artist": "Slinki", "start": "14:00", "end": "15:00"},
+            {"artist": "AC1D Vicious", "start": "15:00", "end": "16:00"},
+            {"artist": "DJ Cries in Spanish", "start": "16:00", "end": "17:00"},
+            {"artist": "Koarse", "start": "17:00", "end": "18:00"},
+            {"artist": "JMDasha", "start": "18:00", "end": "19:00"},
+            {"artist": "Chy", "start": "19:00", "end": "20:00"},
+            {"artist": "Phia Sky", "start": "20:00", "end": "21:00"},
+            {"artist": "Keptek", "start": "21:00", "end": "22:00"},
+            {"artist": "Kitsch", "start": "22:00", "end": "23:00"}
           ]
         },
         {
           "id": "skyline",
           "name": "Skyline",
+          "notes": "10 years since getting married at Bang Face!",
           "sets": [
-            {
-              "artist": "Quiz signup",
-              "start": "13:00",
-              "end": "14:00"
-            },
-            {
-              "artist": "Quiz with DJ Trev",
-              "start": "14:00",
-              "end": "17:00"
-            },
-            {
-              "artist": "Church of Donkology",
-              "start": "17:00",
-              "end": "19:00"
-            },
-            {
-              "artist": "Fareevader",
-              "start": "19:00",
-              "end": "20:00"
-            },
-            {
-              "artist": "Pete Bennett",
-              "start": "20:00",
-              "end": "21:00"
-            },
-            {
-              "artist": "Mark Archer: 10 years since getting married at Bangface!",
-              "start": "21:00",
-              "end": "22:00"
-            }
+            {"artist": "Quiz Sign-up", "start": "13:00", "end": "14:00"},
+            {"artist": "The Quiz with DJ Trev", "start": "14:00", "end": "17:00"},
+            {"artist": "Church of Donkology", "start": "17:00", "end": "19:00"},
+            {"artist": "Fareevader", "start": "19:00", "end": "20:00"},
+            {"artist": "Pete Bennett", "start": "20:00", "end": "21:00"},
+            {"artist": "Mark Archer", "start": "21:00", "end": null}
           ]
         }
+      ],
+      "extras": [
+        {"name": "Closing Party with Saint Acid & The Bang Face Hard Crew", "location": "Bang Room", "start": "23:00", "end": "01:00"},
+        {"name": "Cinema Bang Face", "start": "18:00", "end": "23:30"},
+        {"name": "Laser Tag", "start": "15:00", "end": "18:00"},
+        {"name": "Free Fairground", "start": "15:00", "end": "18:00"},
+        {"name": "Bowling", "start": "14:00", "end": "20:00"},
+        {"name": "Beach Gate", "start": "10:00", "end": "16:00"},
+        {"name": "Arcade", "start": "12:00", "end": null}
       ]
     }
   ]
