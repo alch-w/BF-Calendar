@@ -133,6 +133,47 @@ function playableSets(stage) {
   return stage.sets.filter(isPlayableSet);
 }
 
+/**
+ * When the room has no more sets (ms on festival day). Last playable set end, closure rows,
+ * and explicit stage.closesAt (room may stay open after the final DJ).
+ * @param {string} dayDate
+ * @param {Stage} stage
+ * @returns {number} 0 when unknown
+ */
+function stageCloseTimeMs(dayDate, stage) {
+  let closeMs = 0;
+  for (const set of playableSets(stage)) {
+    const { end } = parseSetTimes(dayDate, set);
+    closeMs = Math.max(closeMs, end.getTime());
+  }
+  for (const set of stage.sets) {
+    if (set.kind === "closure") {
+      const { start } = parseSetTimes(dayDate, set);
+      closeMs = Math.max(closeMs, start.getTime());
+    }
+  }
+  if (stage.closesAt) {
+    closeMs = Math.max(closeMs, parseClockOnFestivalDay(dayDate, stage.closesAt).getTime());
+  }
+  return closeMs;
+}
+
+/** @returns {string | null} 24h HH:MM for display */
+function getStageClosesAtClock(dayDate, stage) {
+  const closeMs = stageCloseTimeMs(dayDate, stage);
+  if (!closeMs) return null;
+  return formatTime(new Date(closeMs));
+}
+
+function formatStageClosesLabel(dayDate, stage) {
+  const clock = getStageClosesAtClock(dayDate, stage);
+  return clock ? `Closes ${clock}` : null;
+}
+
+function stageHasClosureNote(stage) {
+  return Boolean(stage.closureNote || stage.sets.some((s) => s.kind === "closure"));
+}
+
 function makeSetId(day, stage, set) {
   const dayKey = day.id || day.date;
   const stageKey = stage.id || stage.name;
@@ -277,9 +318,9 @@ function renderFlaggedUpcoming(now = new Date()) {
 }
 
 function isRoomClosed(stage, dayDate, now = new Date()) {
-  if (!stage.closesAt) return false;
-  const closeAt = parseClockOnFestivalDay(dayDate, stage.closesAt);
-  return now.getTime() >= closeAt.getTime();
+  const closeMs = stageCloseTimeMs(dayDate, stage);
+  if (!closeMs) return false;
+  return now.getTime() >= closeMs;
 }
 
 function findActiveDay(now = new Date()) {
@@ -301,10 +342,7 @@ function findActiveDay(now = new Date()) {
         dayStart = Math.min(dayStart, start.getTime());
         dayEnd = Math.max(dayEnd, end.getTime());
       }
-      if (stage.closesAt) {
-        const close = parseClockOnFestivalDay(day.date, stage.closesAt).getTime();
-        dayEnd = Math.max(dayEnd, close);
-      }
+      dayEnd = Math.max(dayEnd, stageCloseTimeMs(day.date, stage));
     }
     return { index, day, dayStart, dayEnd };
   });
@@ -386,10 +424,11 @@ function renderNow() {
     title.textContent = stage.name;
     card.appendChild(title);
 
-    if (stage.closesAt) {
+    const closesLabel = formatStageClosesLabel(active.day.date, stage);
+    if (closesLabel) {
       const meta = document.createElement("p");
       meta.className = "room-meta";
-      meta.textContent = `Closes ${stage.closesAt}`;
+      meta.textContent = closesLabel;
       card.appendChild(meta);
     }
 
@@ -399,7 +438,8 @@ function renderNow() {
       const shut = document.createElement("div");
       shut.className = "slot closure";
       const note = stage.closureNote || "Room closed — head to other rooms";
-      shut.innerHTML = `<div class="time">${escapeHtml(stage.closesAt || "")}</div><div><span class="badge idle">Closed</span><div class="artist">${escapeHtml(note)}</div></div>`;
+      const closedClock = getStageClosesAtClock(active.day.date, stage) || "";
+      shut.innerHTML = `<div class="time">${escapeHtml(closedClock)}</div><div><span class="badge idle">Closed</span><div class="artist">${escapeHtml(note)}</div></div>`;
       card.appendChild(shut);
       el.nowList.appendChild(card);
       continue;
@@ -419,11 +459,11 @@ function renderNow() {
 
     if (next) {
       card.appendChild(slotEl(next, "next", "Up next"));
-    } else if (stage.closesAt) {
+    } else if (closesLabel || stageHasClosureNote(stage)) {
       const hint = document.createElement("div");
       hint.className = "slot";
-      const closeT = parseClockOnFestivalDay(active.day.date, stage.closesAt);
-      hint.innerHTML = `<div class="time">${formatTime(closeT)}</div><div class="artist muted-text">${escapeHtml(stage.closureNote || "Room closes")}</div>`;
+      const closeClock = getStageClosesAtClock(active.day.date, stage) || "—";
+      hint.innerHTML = `<div class="time">${escapeHtml(closeClock)}</div><div class="artist muted-text">${escapeHtml(stage.closureNote || "Room closes")}</div>`;
       card.appendChild(hint);
     } else {
       const done = document.createElement("div");
@@ -473,9 +513,7 @@ function buildHourGrid(dayDate, stages) {
       min = Math.min(min, start.getTime());
       max = Math.max(max, end.getTime());
     }
-    if (stage.closesAt) {
-      max = Math.max(max, parseClockOnFestivalDay(dayDate, stage.closesAt).getTime());
-    }
+    max = Math.max(max, stageCloseTimeMs(dayDate, stage));
   }
   if (!Number.isFinite(min)) return { hours: [], gridStart: 0, gridEnd: 0 };
 
@@ -585,10 +623,11 @@ function renderSchedule() {
     head.className = "cal-stage-head";
     head.setAttribute("role", "columnheader");
     head.textContent = stage.name;
-    if (stage.closesAt) {
+    const headCloses = formatStageClosesLabel(day.date, stage);
+    if (headCloses) {
       const close = document.createElement("span");
       close.className = "cal-stage-close";
-      close.textContent = `til ${stage.closesAt}`;
+      close.textContent = headCloses;
       head.appendChild(close);
     }
     headCols.appendChild(head);
@@ -634,7 +673,8 @@ function renderSchedule() {
       appendCalEvent(colBody, day, stage, set, gridStart);
     }
 
-    if (stage.closesAt && !stage.sets.some((x) => x.kind === "closure")) {
+    const closeClock = getStageClosesAtClock(day.date, stage);
+    if (stage.closesAt && closeClock && !stage.sets.some((x) => x.kind === "closure")) {
       appendCalEvent(
         colBody,
         day,
@@ -642,8 +682,8 @@ function renderSchedule() {
         {
           kind: "closure",
           artist: "Room closed",
-          start: stage.closesAt,
-          end: stage.closesAt,
+          start: closeClock,
+          end: closeClock,
           note: stage.closureNote || "Room closed",
         },
         gridStart,
