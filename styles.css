@@ -678,7 +678,53 @@ body {
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
-  padding-bottom: 0.5rem;
+  padding-bottom: calc(0.5rem + var(--safe-bottom));
+}
+
+/* Schedule fills the space under the tab bar and scrolls in .cal-scroll-wrap.
+   The room-name row sticks inside that same scroller, so it stays put while
+   the grid moves vertically and still tracks the columns sideways. */
+body:has(#view-schedule:not(.hidden)) {
+  height: 100dvh;
+  max-height: 100dvh;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
+}
+
+body:has(#view-schedule:not(.hidden)) .app-header,
+body:has(#view-schedule:not(.hidden)) .offline-banner,
+body:has(#view-schedule:not(.hidden)) .load-error {
+  flex-shrink: 0;
+}
+
+body:has(#view-schedule:not(.hidden)) #view-schedule {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+body:has(#view-schedule:not(.hidden)) .day-picker-schedule,
+body:has(#view-schedule:not(.hidden)) .cal-scroll-hint {
+  flex-shrink: 0;
+}
+
+body:has(#view-schedule:not(.hidden)) .cal-scroll-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 .schedule-grid.cal-grid-host {
@@ -696,6 +742,13 @@ body {
   align-items: stretch;
 }
 
+.cal-head-row {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: var(--surface);
+}
+
 .cal-gutter,
 .cal-times-col {
   width: var(--cal-gutter-w);
@@ -710,6 +763,7 @@ body {
   min-height: 2.75rem;
   border-bottom: 1px solid var(--grid-line);
   box-shadow: 4px 0 12px rgba(0, 0, 0, 0.5);
+  z-index: 7;
 }
 
 .cal-times-col {
