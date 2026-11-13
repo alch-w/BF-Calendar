@@ -2,6 +2,7 @@
 const LEGACY_SCHEDULE_STORAGE_KEY = "festival-schedule-v2";
 const FLAGS_STORAGE_KEY = "festival-flags-v1";
 const FLAGS_TODAY_ONLY_STORAGE_KEY = "festival-flags-today-only-v1";
+const FLAGS_VIEW_STORAGE_KEY = "festival-flags-view-v1";
 
 /** @typedef {{ artist: string; start: string; end: string | null; kind?: string; note?: string }} Set */
 /** @typedef {{ id: string; name: string; sets: Set[]; closesAt?: string; closureNote?: string; notes?: string }} Stage */
@@ -31,6 +32,9 @@ let flaggedSetIds = loadFlags();
 
 /** When true, Flagged upcoming hides sets on days other than Now's active festival day. */
 let flagsTodayOnly = loadFlagsTodayOnly();
+
+/** "cards" is the richer Flagged rows; "compact" is the one-line view. */
+let flagsView = loadFlagsView();
 
 function isPlayableSet(set) {
   return set.kind !== "closure";
@@ -246,8 +250,52 @@ function saveFlagsTodayOnly() {
   localStorage.setItem(FLAGS_TODAY_ONLY_STORAGE_KEY, flagsTodayOnly ? "1" : "0");
 }
 
+function loadFlagsView() {
+  try {
+    const raw = localStorage.getItem(FLAGS_VIEW_STORAGE_KEY);
+    if (raw === "compact" || raw === "cards") return raw;
+    return "cards";
+  } catch {
+    return "cards";
+  }
+}
+
+function saveFlagsView() {
+  localStorage.setItem(FLAGS_VIEW_STORAGE_KEY, flagsView);
+}
+
 function showFlaggedTodayOnlyToggle() {
   return schedule && visibleDayIndices().length > 1;
+}
+
+function createFlaggedViewSwitch() {
+  const group = document.createElement("div");
+  group.className = "flagged-view-switch";
+  group.setAttribute("role", "group");
+  group.setAttribute("aria-label", "Flagged list layout");
+
+  const options = [
+    { id: "cards", label: "Cards" },
+    { id: "compact", label: "Compact" },
+  ];
+  for (const opt of options) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "flagged-view-btn";
+    btn.dataset.flagsView = opt.id;
+    btn.textContent = opt.label;
+    const on = flagsView === opt.id;
+    btn.classList.toggle("is-active", on);
+    btn.setAttribute("aria-pressed", String(on));
+    btn.addEventListener("click", () => {
+      if (flagsView === opt.id) return;
+      flagsView = opt.id;
+      saveFlagsView();
+      renderFlaggedUpcoming(new Date(), opt.id);
+    });
+    group.appendChild(btn);
+  }
+  return group;
 }
 
 function createFlaggedSectionHeader() {
@@ -259,6 +307,10 @@ function createFlaggedSectionHeader() {
   h2.className = "flagged-heading";
   h2.textContent = "Flagged upcoming";
   header.appendChild(h2);
+
+  const controls = document.createElement("div");
+  controls.className = "flagged-header-controls";
+  controls.appendChild(createFlaggedViewSwitch());
 
   if (showFlaggedTodayOnlyToggle()) {
     const label = document.createElement("label");
@@ -284,9 +336,10 @@ function createFlaggedSectionHeader() {
 
     label.appendChild(input);
     label.appendChild(text);
-    header.appendChild(label);
+    controls.appendChild(label);
   }
 
+  header.appendChild(controls);
   return header;
 }
 
@@ -360,10 +413,95 @@ function filterFlaggedForTodayOnly(items, now = new Date()) {
   return items.filter(({ day }) => day.date === activeDate);
 }
 
-function renderFlaggedUpcoming(now = new Date()) {
+/** Start–end, or start alone when the set has no end. */
+function formatFlaggedClockRange(set, start, end) {
+  const startLabel = formatTime(start);
+  if (set.end == null || set.end === "") return startLabel;
+  return `${startLabel}–${formatTime(end)}`;
+}
+
+function createFlaggedCardRow({ day, stage, set, start, end }, now, clashingIds) {
+  const setId = makeSetId(day, stage, set);
+  const isClash = clashingIds.has(setId);
+  const li = document.createElement("li");
+  li.className = `flagged-row${isClash ? " flagged-row-clash" : ""}`;
+  const dayHint =
+    schedule.days.length > 1
+      ? `<span class="flagged-playing-in-day">${escapeHtml(day.label)}</span>`
+      : "";
+  const clashBadge = isClash ? `<span class="badge clash">Clash</span>` : "";
+  const countdown = formatFlaggedCountdown(now, start, end);
+  const countdownHtml = countdown
+    ? `<span class="flagged-playing-in-sep" aria-hidden="true">·</span><span class="flagged-time-until is-${countdown.kind}">${escapeHtml(countdown.text)}</span>`
+    : "";
+  li.innerHTML = `
+    <span class="flagged-time">${escapeHtml(formatTime(start))}–${escapeHtml(formatTime(end))}</span>
+    <span class="flagged-meta">
+      <span class="flagged-playing-in">
+        <span class="flagged-playing-in-label">Playing in</span>
+        <span class="flagged-playing-in-sep" aria-hidden="true">·</span>
+        <span class="flagged-playing-in-room">${escapeHtml(stage.name)}</span>
+        ${dayHint}
+        ${countdownHtml}
+      </span>
+      <span class="flagged-artist-row">
+        <span class="flagged-artist">${escapeHtml(set.artist)}</span>
+        ${clashBadge}
+      </span>
+    </span>
+  `;
+  return li;
+}
+
+function createFlaggedCompactRow({ day, stage, set, start, end }, now, clashingIds) {
+  const setId = makeSetId(day, stage, set);
+  const isClash = clashingIds.has(setId);
+  const li = document.createElement("li");
+  li.className = `flagged-row flagged-row-compact${isClash ? " flagged-row-clash" : ""}`;
+
+  const time = document.createElement("span");
+  time.className = "flagged-time flagged-compact-time";
+  time.textContent = formatFlaggedClockRange(set, start, end);
+
+  const artist = document.createElement("span");
+  artist.className = "flagged-artist flagged-compact-artist";
+  artist.textContent = set.artist;
+
+  const room = document.createElement("span");
+  room.className = "flagged-playing-in-room flagged-compact-room";
+  room.textContent = stage.name;
+
+  li.append(time, artist, room);
+
+  const countdown = formatFlaggedCountdown(now, start, end);
+  if (countdown) {
+    const until = document.createElement("span");
+    until.className = `flagged-time-until flagged-compact-until is-${countdown.kind}`;
+    until.textContent = countdown.text;
+    li.appendChild(until);
+  }
+
+  if (isClash) {
+    const mark = document.createElement("span");
+    mark.className = "flagged-compact-clash";
+    mark.title = "Clash";
+    mark.setAttribute("role", "img");
+    mark.setAttribute("aria-label", "Clash");
+    mark.innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="0.6" y="0.6" width="10" height="10" rx="1.4" fill="currentColor"/><rect x="5.4" y="5.4" width="10" height="10" rx="1.4" fill="#e10600" stroke="currentColor" stroke-width="1.6"/></svg>`;
+    li.appendChild(mark);
+  }
+
+  return li;
+}
+
+function renderFlaggedUpcoming(now = new Date(), focusView = null) {
   if (!el.flaggedUpcoming) return;
   const allUpcoming = collectFlaggedUpcoming(now);
   const items = filterFlaggedForTodayOnly(allUpcoming, now);
+  el.flaggedUpcoming.dataset.flagsView = flagsView;
+
+  el.flaggedUpcoming.replaceChildren();
+  el.flaggedUpcoming.appendChild(createFlaggedSectionHeader());
 
   if (items.length === 0) {
     const hasAnyFlag = flaggedSetIds.size > 0;
@@ -378,57 +516,25 @@ function renderFlaggedUpcoming(now = new Date()) {
     } else {
       emptyMsg = "No flagged sets left today — check Schedule for later days.";
     }
-    el.flaggedUpcoming.replaceChildren();
-    el.flaggedUpcoming.appendChild(createFlaggedSectionHeader());
     const p = document.createElement("p");
     p.className = "flagged-empty";
     p.textContent = emptyMsg;
     el.flaggedUpcoming.appendChild(p);
-    return;
+  } else {
+    const clashingIds = findClashingFlaggedIds(items);
+    const list = document.createElement("ul");
+    list.className = flagsView === "compact" ? "flagged-list flagged-list-compact" : "flagged-list";
+    const buildRow = flagsView === "compact" ? createFlaggedCompactRow : createFlaggedCardRow;
+    for (const item of items) {
+      list.appendChild(buildRow(item, now, clashingIds));
+    }
+    el.flaggedUpcoming.appendChild(list);
   }
 
-  const clashingIds = findClashingFlaggedIds(items);
-
-  const list = document.createElement("ul");
-  list.className = "flagged-list";
-  for (const { day, stage, set, start, end } of items) {
-    const setId = makeSetId(day, stage, set);
-    const isClash = clashingIds.has(setId);
-    const li = document.createElement("li");
-    li.className = `flagged-row${isClash ? " flagged-row-clash" : ""}`;
-    const dayHint =
-      schedule.days.length > 1
-        ? `<span class="flagged-playing-in-day">${escapeHtml(day.label)}</span>`
-        : "";
-    const clashBadge = isClash
-      ? `<span class="badge clash">Clash</span>`
-      : "";
-    const countdown = formatFlaggedCountdown(now, start, end);
-    const countdownHtml = countdown
-      ? `<span class="flagged-playing-in-sep" aria-hidden="true">·</span><span class="flagged-time-until is-${countdown.kind}">${escapeHtml(countdown.text)}</span>`
-      : "";
-    li.innerHTML = `
-      <span class="flagged-time">${escapeHtml(formatTime(start))}–${escapeHtml(formatTime(end))}</span>
-      <span class="flagged-meta">
-        <span class="flagged-playing-in">
-          <span class="flagged-playing-in-label">Playing in</span>
-          <span class="flagged-playing-in-sep" aria-hidden="true">·</span>
-          <span class="flagged-playing-in-room">${escapeHtml(stage.name)}</span>
-          ${dayHint}
-          ${countdownHtml}
-        </span>
-        <span class="flagged-artist-row">
-          <span class="flagged-artist">${escapeHtml(set.artist)}</span>
-          ${clashBadge}
-        </span>
-      </span>
-    `;
-    list.appendChild(li);
+  if (focusView === "cards" || focusView === "compact") {
+    const btn = el.flaggedUpcoming.querySelector(`[data-flags-view="${focusView}"]`);
+    if (btn instanceof HTMLElement) btn.focus();
   }
-
-  el.flaggedUpcoming.replaceChildren();
-  el.flaggedUpcoming.appendChild(createFlaggedSectionHeader());
-  el.flaggedUpcoming.appendChild(list);
 }
 
 function isRoomClosed(stage, dayDate, now = new Date()) {

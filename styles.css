@@ -225,11 +225,59 @@ body {
 
 .flagged-heading {
   margin: 0;
+  flex: 0 0 auto;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--accent);
   font-weight: 800;
+}
+
+.flagged-header-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.7rem;
+}
+
+.flagged-view-switch {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0.12rem;
+  padding: 0.12rem;
+  background: var(--surface);
+  border: 1px solid var(--grid-line);
+  border-radius: 4px;
+}
+
+.flagged-view-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  padding: 0.35rem 0.55rem;
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: 2px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.flagged-view-btn.is-active {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.flagged-view-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .flagged-today-toggle {
@@ -414,6 +462,80 @@ body {
 .flagged-row-clash {
   border-color: rgba(225, 6, 0, 0.55);
   box-shadow: inset 0 0 0 1px rgba(225, 6, 0, 0.2);
+}
+
+.flagged-list-compact {
+  gap: 0.22rem;
+}
+
+.flagged-row.flagged-row-compact {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: baseline;
+  column-gap: 0.4rem;
+  row-gap: 0;
+  padding: 0.28rem 0.45rem;
+  overflow: hidden;
+}
+
+.flagged-row.flagged-row-compact.flagged-row-clash {
+  grid-template-columns: auto minmax(0, 1fr) auto auto auto;
+}
+
+.flagged-compact-time,
+.flagged-compact-room,
+.flagged-compact-until,
+.flagged-compact-clash {
+  white-space: nowrap;
+}
+
+.flagged-compact-time {
+  line-height: 1.2;
+}
+
+.flagged-compact-artist {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+  font-size: 0.82rem;
+  line-height: 1.2;
+}
+
+.flagged-compact-room {
+  max-width: 6.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+}
+
+.flagged-compact-until {
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+
+.flagged-compact-clash {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  color: #ffffff;
+  background: #e10600;
+  border-radius: 2px;
+  line-height: 0;
+}
+
+.flagged-compact-clash svg {
+  display: block;
+  width: 14px;
+  height: 14px;
 }
 
 .badge.clash {
