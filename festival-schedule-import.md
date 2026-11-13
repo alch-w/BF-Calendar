@@ -2,7 +2,7 @@
 
 The app loads **`schedule.json` only** (no in-app editor). Edit that file in the repo, then push so Netlify redeploys.
 
-**Flagged sets** stay on the device in browser `localStorage` (`festival-flags-v1`) and are not part of this file.
+**Flagged sets** stay on the device in browser `localStorage` (`festival-flags-v1`) and are not part of this file. The Now tab **Today only** filter for flagged upcoming uses `festival-flags-today-only-v1`.
 
 ## JSON schema (summary)
 

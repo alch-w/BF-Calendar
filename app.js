@@ -1,6 +1,7 @@
 /** @deprecated Removed import UI — cleared on load so bundled schedule wins. */
 const LEGACY_SCHEDULE_STORAGE_KEY = "festival-schedule-v2";
 const FLAGS_STORAGE_KEY = "festival-flags-v1";
+const FLAGS_TODAY_ONLY_STORAGE_KEY = "festival-flags-today-only-v1";
 
 /** @typedef {{ artist: string; start: string; end: string; kind?: string; note?: string }} Set */
 /** @typedef {{ id: string; name: string; sets: Set[]; closesAt?: string; closureNote?: string }} Stage */
@@ -27,6 +28,9 @@ const el = {
 
 /** @type {Set<string>} */
 let flaggedSetIds = loadFlags();
+
+/** When true, Flagged upcoming hides sets on days other than Now's active festival day. */
+let flagsTodayOnly = loadFlagsTodayOnly();
 
 function isPlayableSet(set) {
   return set.kind !== "closure";
@@ -196,6 +200,65 @@ function saveFlags() {
   localStorage.setItem(FLAGS_STORAGE_KEY, JSON.stringify([...flaggedSetIds]));
 }
 
+function loadFlagsTodayOnly() {
+  try {
+    const raw = localStorage.getItem(FLAGS_TODAY_ONLY_STORAGE_KEY);
+    if (raw === "1" || raw === "true") return true;
+    if (raw === "0" || raw === "false") return false;
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+function saveFlagsTodayOnly() {
+  localStorage.setItem(FLAGS_TODAY_ONLY_STORAGE_KEY, flagsTodayOnly ? "1" : "0");
+}
+
+function showFlaggedTodayOnlyToggle() {
+  return schedule && visibleDayIndices().length > 1;
+}
+
+function createFlaggedSectionHeader() {
+  const header = document.createElement("div");
+  header.className = "flagged-header";
+
+  const h2 = document.createElement("h2");
+  h2.id = "flagged-heading";
+  h2.className = "flagged-heading";
+  h2.textContent = "Flagged upcoming";
+  header.appendChild(h2);
+
+  if (showFlaggedTodayOnlyToggle()) {
+    const label = document.createElement("label");
+    label.className = "flagged-today-toggle";
+
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.className = "flagged-today-toggle-input";
+    input.checked = flagsTodayOnly;
+    input.setAttribute("role", "switch");
+    input.setAttribute("aria-checked", String(flagsTodayOnly));
+
+    const text = document.createElement("span");
+    text.className = "flagged-today-toggle-label";
+    text.textContent = "Today only";
+
+    input.addEventListener("change", () => {
+      flagsTodayOnly = input.checked;
+      input.setAttribute("aria-checked", String(flagsTodayOnly));
+      saveFlagsTodayOnly();
+      renderFlaggedUpcoming(new Date());
+    });
+
+    label.appendChild(input);
+    label.appendChild(text);
+    header.appendChild(label);
+  }
+
+  return header;
+}
+
 function isFlagged(setId) {
   return flaggedSetIds.has(setId);
 }
@@ -256,16 +319,38 @@ function findClashingFlaggedIds(items) {
   return clashing;
 }
 
+function filterFlaggedForTodayOnly(items, now = new Date()) {
+  if (!flagsTodayOnly) return items;
+  const active = findActiveDay(now);
+  const activeDate = active?.day?.date;
+  if (!activeDate) return items;
+  return items.filter(({ day }) => day.date === activeDate);
+}
+
 function renderFlaggedUpcoming(now = new Date()) {
   if (!el.flaggedUpcoming) return;
-  const items = collectFlaggedUpcoming(now);
+  const allUpcoming = collectFlaggedUpcoming(now);
+  const items = filterFlaggedForTodayOnly(allUpcoming, now);
 
   if (items.length === 0) {
     const hasAnyFlag = flaggedSetIds.size > 0;
-    el.flaggedUpcoming.innerHTML = `
-      <h2 id="flagged-heading" class="flagged-heading">Flagged upcoming</h2>
-      <p class="flagged-empty">${hasAnyFlag ? "No flagged sets left today — check Schedule for later days." : "Flag sets on the Schedule grid (☆) to track them here."}</p>
-    `;
+    const hasLaterWhenTodayOnly =
+      flagsTodayOnly && hasAnyFlag && allUpcoming.length > 0;
+    let emptyMsg;
+    if (!hasAnyFlag) {
+      emptyMsg = "Flag sets on the Schedule grid (☆) to track them here.";
+    } else if (hasLaterWhenTodayOnly) {
+      emptyMsg =
+        "No flagged sets on this festival day. Turn off Today only to see later days.";
+    } else {
+      emptyMsg = "No flagged sets left today — check Schedule for later days.";
+    }
+    el.flaggedUpcoming.replaceChildren();
+    el.flaggedUpcoming.appendChild(createFlaggedSectionHeader());
+    const p = document.createElement("p");
+    p.className = "flagged-empty";
+    p.textContent = emptyMsg;
+    el.flaggedUpcoming.appendChild(p);
     return;
   }
 
@@ -308,12 +393,8 @@ function renderFlaggedUpcoming(now = new Date()) {
     list.appendChild(li);
   }
 
-  el.flaggedUpcoming.innerHTML = "";
-  const h2 = document.createElement("h2");
-  h2.id = "flagged-heading";
-  h2.className = "flagged-heading";
-  h2.textContent = "Flagged upcoming";
-  el.flaggedUpcoming.appendChild(h2);
+  el.flaggedUpcoming.replaceChildren();
+  el.flaggedUpcoming.appendChild(createFlaggedSectionHeader());
   el.flaggedUpcoming.appendChild(list);
 }
 
