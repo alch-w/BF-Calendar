@@ -174,12 +174,49 @@ body {
   min-width: 0;
 }
 
-.flagged-stage {
-  font-size: 0.68rem;
-  color: var(--muted);
+.flagged-playing-in {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.3rem;
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.flagged-playing-in-label {
+  color: #e10600;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.flagged-playing-in-sep {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.flagged-playing-in-room {
+  color: #ffffff;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-weight: 700;
+}
+
+.flagged-playing-in-day {
+  flex-basis: 100%;
+  font-size: 0.65rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.flagged-artist-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
 }
 
 .flagged-artist {
@@ -187,6 +224,26 @@ body {
   font-weight: 700;
   line-height: 1.25;
   overflow-wrap: anywhere;
+}
+
+.flagged-row-clash {
+  border-color: rgba(225, 6, 0, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(225, 6, 0, 0.2);
+}
+
+.flagged-clash-note {
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #e10600;
+}
+
+.badge.clash {
+  background: #e10600;
+  color: #ffffff;
+  flex-shrink: 0;
 }
 
 .card-list {

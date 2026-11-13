@@ -157,6 +157,27 @@ function collectFlaggedUpcoming(now = new Date()) {
   return out;
 }
 
+/** True when two parsed set intervals overlap (same rule as schedule timing). */
+function flaggedIntervalsOverlap(a, b) {
+  return a.start.getTime() < b.end.getTime() && b.start.getTime() < a.end.getTime();
+}
+
+/** Set IDs among upcoming flagged sets that overlap at least one other flagged set. */
+function findClashingFlaggedIds(items) {
+  /** @type {Set<string>} */
+  const clashing = new Set();
+  for (let i = 0; i < items.length; i++) {
+    const idA = makeSetId(items[i].day, items[i].stage, items[i].set);
+    for (let j = i + 1; j < items.length; j++) {
+      if (flaggedIntervalsOverlap(items[i], items[j])) {
+        clashing.add(idA);
+        clashing.add(makeSetId(items[j].day, items[j].stage, items[j].set));
+      }
+    }
+  }
+  return clashing;
+}
+
 function renderFlaggedUpcoming(now = new Date()) {
   if (!el.flaggedUpcoming) return;
   const items = collectFlaggedUpcoming(now);
@@ -170,17 +191,36 @@ function renderFlaggedUpcoming(now = new Date()) {
     return;
   }
 
+  const clashingIds = findClashingFlaggedIds(items);
+  const hasClash = clashingIds.size > 0;
+
   const list = document.createElement("ul");
   list.className = "flagged-list";
   for (const { day, stage, set, start, end } of items) {
+    const setId = makeSetId(day, stage, set);
+    const isClash = clashingIds.has(setId);
     const li = document.createElement("li");
-    li.className = "flagged-row";
-    const dayHint = schedule.days.length > 1 ? ` · ${day.label}` : "";
+    li.className = `flagged-row${isClash ? " flagged-row-clash" : ""}`;
+    const dayHint =
+      schedule.days.length > 1
+        ? `<span class="flagged-playing-in-day">${escapeHtml(day.label)}</span>`
+        : "";
+    const clashBadge = isClash
+      ? `<span class="badge clash">Clash</span>`
+      : "";
     li.innerHTML = `
       <span class="flagged-time">${escapeHtml(formatTime(start))}–${escapeHtml(formatTime(end))}</span>
       <span class="flagged-meta">
-        <span class="flagged-stage">${escapeHtml(stage.name)}${escapeHtml(dayHint)}</span>
-        <span class="flagged-artist">${escapeHtml(set.artist)}</span>
+        <span class="flagged-playing-in">
+          <span class="flagged-playing-in-label">Playing in</span>
+          <span class="flagged-playing-in-sep" aria-hidden="true">·</span>
+          <span class="flagged-playing-in-room">${escapeHtml(stage.name)}</span>
+          ${dayHint}
+        </span>
+        <span class="flagged-artist-row">
+          <span class="flagged-artist">${escapeHtml(set.artist)}</span>
+          ${clashBadge}
+        </span>
       </span>
     `;
     list.appendChild(li);
@@ -192,6 +232,12 @@ function renderFlaggedUpcoming(now = new Date()) {
   h2.className = "flagged-heading";
   h2.textContent = "Flagged upcoming";
   el.flaggedUpcoming.appendChild(h2);
+  if (hasClash) {
+    const note = document.createElement("p");
+    note.className = "flagged-clash-note";
+    note.textContent = "You flagged clashing sets";
+    el.flaggedUpcoming.appendChild(note);
+  }
   el.flaggedUpcoming.appendChild(list);
 }
 
