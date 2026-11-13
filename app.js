@@ -92,6 +92,43 @@ function formatTime(date) {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
 }
 
+/** Whole minutes for human countdown copy (e.g. 45m, 2h 15m). */
+function formatHumanCountdownMinutes(totalMinutes) {
+  const mins = Math.max(1, totalMinutes);
+  if (mins < 60) return `${mins}m`;
+  const h = Math.floor(mins / 60);
+  const rem = mins % 60;
+  if (rem === 0) return `${h}h`;
+  return `${h}h ${rem}m`;
+}
+
+const FLAGGED_ENDS_SOON_MS = 30 * 60 * 1000;
+
+/**
+ * @param {Date} now
+ * @param {Date} start
+ * @param {Date} end
+ * @returns {{ text: string; kind: "upcoming" | "live" | "ending" } | null}
+ */
+function formatFlaggedCountdown(now, start, end) {
+  const t = now.getTime();
+  const startMs = start.getTime();
+  const endMs = end.getTime();
+  if (t < startMs) {
+    const mins = Math.ceil((startMs - t) / 60_000);
+    return { text: `Starts in ${formatHumanCountdownMinutes(mins)}`, kind: "upcoming" };
+  }
+  if (t < endMs) {
+    const remaining = endMs - t;
+    if (remaining > FLAGGED_ENDS_SOON_MS) {
+      return { text: "On now", kind: "live" };
+    }
+    const mins = Math.ceil(remaining / 60_000);
+    return { text: `Ends in ${formatHumanCountdownMinutes(mins)}`, kind: "ending" };
+  }
+  return null;
+}
+
 function playableSets(stage) {
   return stage.sets.filter(isPlayableSet);
 }
@@ -208,6 +245,10 @@ function renderFlaggedUpcoming(now = new Date()) {
     const clashBadge = isClash
       ? `<span class="badge clash">Clash</span>`
       : "";
+    const countdown = formatFlaggedCountdown(now, start, end);
+    const countdownHtml = countdown
+      ? `<span class="flagged-playing-in-sep" aria-hidden="true">·</span><span class="flagged-time-until is-${countdown.kind}">${escapeHtml(countdown.text)}</span>`
+      : "";
     li.innerHTML = `
       <span class="flagged-time">${escapeHtml(formatTime(start))}–${escapeHtml(formatTime(end))}</span>
       <span class="flagged-meta">
@@ -216,6 +257,7 @@ function renderFlaggedUpcoming(now = new Date()) {
           <span class="flagged-playing-in-sep" aria-hidden="true">·</span>
           <span class="flagged-playing-in-room">${escapeHtml(stage.name)}</span>
           ${dayHint}
+          ${countdownHtml}
         </span>
         <span class="flagged-artist-row">
           <span class="flagged-artist">${escapeHtml(set.artist)}</span>

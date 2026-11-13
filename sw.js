@@ -1,5 +1,5 @@
 /** Bump when shell or schedule assets change so clients refresh offline caches. */
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v4";
 const CACHE_NAME = `festival-offline-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [

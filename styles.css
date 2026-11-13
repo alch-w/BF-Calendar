@@ -212,6 +212,23 @@ body {
   letter-spacing: 0.05em;
 }
 
+.flagged-time-until {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.flagged-time-until.is-upcoming,
+.flagged-time-until.is-ending {
+  color: var(--next);
+}
+
+.flagged-time-until.is-live {
+  color: var(--now);
+  text-transform: uppercase;
+}
+
 .flagged-artist-row {
   display: flex;
   flex-wrap: wrap;
