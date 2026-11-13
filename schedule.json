@@ -1,0 +1,87 @@
+{
+  "festival": "FRI",
+  "timezone": "Europe/London",
+  "days": [
+    {
+      "id": "friday",
+      "label": "Friday",
+      "date": "2026-11-13",
+      "stages": [
+        {
+          "id": "bang-room",
+          "name": "Bang Room",
+          "closesAt": "02:00",
+          "closeMessage": "Bang Room closes 2am — head to the other rooms!",
+          "sets": [
+            { "artist": "Dave Skywalker", "start": "19:00", "end": "20:00" },
+            { "artist": "Opening Ceremony", "start": "20:00", "end": "21:00" },
+            { "artist": "Dick & Dom", "start": "21:00", "end": "22:00" },
+            { "artist": "Mandidextrous", "start": "22:00", "end": "23:00" },
+            { "artist": "A.N.I.", "start": "23:00", "end": "00:00" },
+            { "artist": "Russian Village Boys", "start": "00:00", "end": "01:00" },
+            { "artist": "Jowi", "start": "01:00", "end": "02:00" }
+          ]
+        },
+        {
+          "id": "face-room",
+          "name": "Face Room",
+          "sets": [
+            { "artist": "Sample Junkie", "start": "20:00", "end": "21:00" },
+            { "artist": "Ushko", "start": "21:00", "end": "22:00" },
+            { "artist": "Umru", "start": "22:00", "end": "23:00" },
+            { "artist": "I. Jordan", "start": "23:00", "end": "00:00" },
+            { "artist": "Eris Drew & Octo Octa", "start": "00:00", "end": "02:00" },
+            { "artist": "Tanukichi", "start": "02:00", "end": "03:00" },
+            { "artist": "Floxytek", "start": "03:00", "end": "04:00" },
+            { "artist": "Dolphin", "start": "04:00", "end": "05:00" }
+          ]
+        },
+        {
+          "id": "hard-crew",
+          "name": "Hard Crew",
+          "sets": [
+            { "artist": "Robyn Chaos", "start": "20:00", "end": "21:00" },
+            { "artist": "Jason Forrest", "start": "21:00", "end": "22:00" },
+            { "artist": "Nero's Day at Disneyland", "start": "22:00", "end": "23:00" },
+            { "artist": "Goreshit", "start": "23:00", "end": "00:00" },
+            { "artist": "FFF", "start": "00:00", "end": "01:00" },
+            { "artist": "Dev/Null", "start": "01:00", "end": "02:00" },
+            { "artist": "Bizzy B", "start": "02:00", "end": "03:00" },
+            { "artist": "Tim Reaper & Dwarde", "start": "03:00", "end": "04:00" }
+          ]
+        },
+        {
+          "id": "hotshots",
+          "name": "Hotshots",
+          "closesAt": "04:00",
+          "sets": [
+            { "artist": "Chipmunk Spunk", "start": "18:00", "end": "19:00" },
+            { "artist": "Breezyc", "start": "19:00", "end": "20:00" },
+            { "artist": "Otto Vlotto", "start": "20:00", "end": "21:00" },
+            { "artist": "Misstress Virgyn", "start": "21:00", "end": "22:00" },
+            { "artist": "Lotus Phaze", "start": "22:00", "end": "23:00" },
+            { "artist": "Light Gal", "start": "23:00", "end": "00:00" },
+            { "artist": "DJ Osu!", "start": "00:00", "end": "01:00" },
+            { "artist": "Slayphex Twins", "start": "01:00", "end": "02:00" },
+            { "artist": "Gupi", "start": "02:00", "end": "03:00" },
+            { "artist": "Emily Knight", "start": "03:00", "end": "04:00" }
+          ]
+        },
+        {
+          "id": "skyline",
+          "name": "Skyline",
+          "sets": [
+            { "artist": "DJ Trev Welcome Set", "start": "14:00", "end": "16:00" },
+            {
+              "artist": "Half East Records (Ting Run Run, Kuya Betas, Beejibe, Tirta)",
+              "start": "16:00",
+              "end": "20:00"
+            },
+            { "artist": "Wrong Music", "start": "20:00", "end": "22:00" },
+            { "artist": "Dogshow", "start": "22:00", "end": "23:30" }
+          ]
+        }
+      ]
+    }
+  ]
+}

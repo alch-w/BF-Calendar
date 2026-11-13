@@ -1,0 +1,528 @@
+:root {
+  --bg: #0f0f12;
+  --surface: #1a1a22;
+  --surface-2: #24242f;
+  --text: #f4f4f7;
+  --muted: #9b9bab;
+  --accent: #7c5cff;
+  --accent-dim: rgba(124, 92, 255, 0.2);
+  --now: #3dd68c;
+  --next: #ffb347;
+  --radius: 12px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --cal-row-px: 44px;
+  --cal-col-w: 6.75rem;
+  --cal-gutter-w: 3.1rem;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.45;
+  padding-bottom: calc(1rem + var(--safe-bottom));
+}
+
+.hidden {
+  display: none !important;
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: linear-gradient(var(--bg) 70%, transparent);
+  padding: max(0.75rem, env(safe-area-inset-top)) 1rem 0.5rem;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.context-line {
+  margin: 0.25rem 0 0.75rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.view-tabs {
+  display: flex;
+  gap: 0.35rem;
+  background: var(--surface);
+  padding: 0.25rem;
+  border-radius: 999px;
+}
+
+.tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.55rem 0.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.panel {
+  padding: 0 1rem 1.5rem;
+  max-width: 32rem;
+  margin: 0 auto;
+}
+
+.banner {
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  border-left: 3px solid var(--accent);
+}
+
+.flagged-section {
+  margin-bottom: 1rem;
+}
+
+.flagged-heading {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.flagged-empty {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.flagged-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.flagged-row {
+  display: grid;
+  grid-template-columns: 5.25rem 1fr;
+  gap: 0.5rem 0.65rem;
+  align-items: start;
+  background: var(--surface);
+  border: 1px solid rgba(255, 179, 71, 0.25);
+  border-radius: var(--radius);
+  padding: 0.55rem 0.65rem;
+}
+
+.flagged-time {
+  font-size: 0.72rem;
+  color: var(--next);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.flagged-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.flagged-stage {
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.flagged-artist {
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stage-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.stage-card h3 {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.slot {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  gap: 0.5rem 0.75rem;
+  align-items: start;
+  padding: 0.5rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.slot:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.slot .time {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.slot .artist {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.slot.now .artist {
+  color: var(--now);
+}
+
+.slot.next .artist {
+  color: var(--next);
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  margin-bottom: 0.2rem;
+}
+
+.badge.live {
+  background: rgba(61, 214, 140, 0.2);
+  color: var(--now);
+}
+
+.badge.upnext {
+  background: rgba(255, 179, 71, 0.2);
+  color: var(--next);
+}
+
+.badge.idle {
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.day-picker {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.day-btn {
+  flex: 1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  padding: 0.65rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.day-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: #fff;
+}
+
+.panel-schedule {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.day-picker-schedule {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.cal-scroll-hint {
+  margin: 0 1rem 0.5rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.cal-scroll-wrap {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  padding-bottom: 0.5rem;
+}
+
+.schedule-grid.cal-grid-host {
+  min-width: 100%;
+}
+
+.cal-table {
+  width: max-content;
+  min-width: 100%;
+}
+
+.cal-head-row,
+.cal-body-row {
+  display: flex;
+  align-items: stretch;
+}
+
+.cal-gutter,
+.cal-times-col {
+  width: var(--cal-gutter-w);
+  flex-shrink: 0;
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  background: var(--bg);
+}
+
+.cal-gutter {
+  min-height: 2.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.2);
+}
+
+.cal-times-col {
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.25);
+}
+
+.cal-head-cols,
+.cal-cols-wrap {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.cal-cols-wrap {
+  position: relative;
+}
+
+.cal-stage-head,
+.cal-stage-col {
+  width: var(--cal-col-w);
+  flex-shrink: 0;
+}
+
+.cal-stage-head {
+  background: var(--surface);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.45rem 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-align: center;
+  min-height: 2.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+}
+
+.cal-stage-close {
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.cal-time {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.68rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  padding: 0.15rem 0.35rem 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.cal-time-now {
+  color: var(--now);
+  font-weight: 700;
+}
+
+.cal-col-body {
+  position: relative;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.cal-row-line {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  pointer-events: none;
+}
+
+.cal-row-line-now {
+  background: rgba(61, 214, 140, 0.06);
+}
+
+.cal-event {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  z-index: 2;
+  padding: 0.2rem 0.28rem;
+  padding-right: 1.55rem;
+  border-radius: 6px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(124, 92, 255, 0.35);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+  touch-action: pan-x pan-y;
+}
+
+.cal-event-flagged {
+  border-color: rgba(255, 179, 71, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(255, 179, 71, 0.2);
+}
+
+.cal-flag {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cal-flag.is-flagged {
+  color: var(--next);
+}
+
+.cal-flag:active {
+  transform: scale(0.94);
+}
+
+.cal-event-time {
+  font-size: 0.56rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.cal-event-artist {
+  font-size: 0.67rem;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.cal-event-closure {
+  padding-right: 0.28rem;
+  background: rgba(255, 255, 255, 0.06);
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.2);
+  z-index: 1;
+}
+
+.cal-event-closure .cal-event-artist {
+  font-weight: 500;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 0.62rem;
+}
+
+.cal-now-marker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--now);
+  opacity: 0.85;
+  z-index: 5;
+  pointer-events: none;
+  box-shadow: 0 0 8px rgba(61, 214, 140, 0.45);
+}
+
+.muted-text {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.stage-card .room-meta {
+  margin: -0.35rem 0 0.6rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.slot.closure .artist {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+@media (min-width: 480px) {
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  :root {
+    --cal-col-w: 7.25rem;
+  }
+}

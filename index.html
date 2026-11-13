@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#7c5cff" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Alch bangface planner</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand">
+        <h1 id="festival-name">Alch bangface planner</h1>
+        <p id="context-line" class="context-line" aria-live="polite"></p>
+      </div>
+      <nav class="view-tabs" role="tablist" aria-label="Main views">
+        <button type="button" class="tab active" data-view="now" role="tab" aria-selected="true">Now</button>
+        <button type="button" class="tab" data-view="schedule" role="tab" aria-selected="false">Schedule</button>
+      </nav>
+    </header>
+
+    <main id="view-now" class="view panel" role="tabpanel">
+      <div id="now-banner" class="banner hidden"></div>
+      <section id="flagged-upcoming" class="flagged-section" aria-labelledby="flagged-heading"></section>
+      <div id="now-list" class="card-list"></div>
+    </main>
+
+    <main id="view-schedule" class="view panel panel-schedule hidden" role="tabpanel" hidden>
+      <div id="day-picker" class="day-picker day-picker-schedule hidden" role="group" aria-label="Festival day"></div>
+      <p class="cal-scroll-hint" aria-hidden="true">Swipe sideways for all rooms</p>
+      <div class="cal-scroll-wrap">
+        <div id="schedule-grid" class="schedule-grid cal-grid-host" role="grid" aria-label="Festival timetable"></div>
+      </div>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
