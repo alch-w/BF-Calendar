@@ -175,13 +175,15 @@ function playableSets(stage) {
  */
 function stageCloseTimeMs(dayDate, stage) {
   let closeMs = 0;
-  for (const set of playableSets(stage)) {
-    const { end } = parseSetTimes(dayDate, set);
+  const playable = playableSets(stage);
+  for (let pi = 0; pi < playable.length; pi += 1) {
+    const set = playable[pi];
+    const { end } = parseSetTimes(dayDate, set, stage, pi);
     closeMs = Math.max(closeMs, end.getTime());
   }
   for (const set of stage.sets) {
     if (set.kind === "closure") {
-      const { start } = parseSetTimes(dayDate, set);
+      const { start } = parseSetTimes(dayDate, set, stage);
       closeMs = Math.max(closeMs, start.getTime());
     }
   }
@@ -889,6 +891,36 @@ function setOfflineBanner(visible) {
   banner.hidden = !visible;
 }
 
+function formatLoadErrorMessage(err) {
+  const msg = err instanceof Error ? err.message : String(err);
+  return msg.trim() || "Unknown error";
+}
+
+function showLoadError(err) {
+  const banner = document.getElementById("load-error");
+  const text = document.getElementById("load-error-text");
+  if (!banner || !text) return;
+  text.textContent = `Could not load schedule: ${formatLoadErrorMessage(err)}`;
+  banner.classList.remove("hidden");
+  banner.hidden = false;
+}
+
+function hideLoadError() {
+  const banner = document.getElementById("load-error");
+  if (!banner) return;
+  banner.classList.add("hidden");
+  banner.hidden = true;
+}
+
+function wireLoadErrorRetry() {
+  const btn = document.getElementById("load-error-retry");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    hideLoadError();
+    init();
+  });
+}
+
 function wireOfflineBanner() {
   const update = () => setOfflineBanner(!navigator.onLine);
   window.addEventListener("offline", update);
@@ -1089,28 +1121,44 @@ function wireUi() {
   wireRabbitEgg();
 }
 
+let initStarted = false;
+
 async function init() {
-  registerServiceWorker();
-  wireUi();
-  wireOfflineBanner();
-  clearLegacyScheduleStorage();
+  if (!initStarted) {
+    initStarted = true;
+    registerServiceWorker();
+    wireUi();
+    wireOfflineBanner();
+    wireLoadErrorRetry();
+    clearLegacyScheduleStorage();
+  }
+
+  hideLoadError();
+
   try {
     schedule = await loadBundled();
   } catch (e) {
     console.error(e);
+    showLoadError(e);
     return;
   }
 
-  const active = findActiveDay();
-  if (active) selectedDayIndex = active.index;
-  else {
-    const vis = visibleDayIndices();
-    if (vis.length) selectedDayIndex = vis[0];
+  try {
+    const active = findActiveDay();
+    if (active) selectedDayIndex = active.index;
+    else {
+      const vis = visibleDayIndices();
+      if (vis.length) selectedDayIndex = vis[0];
+    }
+    renderDayPicker();
+    renderNow();
+    renderSchedule();
+    startClockTick();
+  } catch (e) {
+    console.error(e);
+    schedule = null;
+    showLoadError(e);
   }
-  renderDayPicker();
-  renderNow();
-  renderSchedule();
-  startClockTick();
 }
 
 init();

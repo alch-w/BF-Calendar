@@ -1,5 +1,5 @@
 /** Bump when shell or schedule assets change so clients refresh offline caches. */
-const CACHE_VERSION = "v7";
+const CACHE_VERSION = "v8";
 const CACHE_NAME = `festival-offline-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
@@ -51,6 +51,25 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+async function networkFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) {
+      cache.put(request, response.clone());
+    }
+    if (response) return response;
+  } catch {
+    /* fall through to cache */
+  }
+  const cached = await cache.match(request);
+  if (cached) return cached;
+  if (request.mode === "navigate") {
+    return cache.match("./index.html");
+  }
+  throw new Error("Network unavailable and no cache for " + request.url);
+}
+
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(CACHE_NAME);
   const cached = await cache.match(request);
@@ -96,14 +115,22 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET" || !isSameOrigin(request)) return;
 
   const url = new URL(request.url);
-  const isSchedule = url.pathname.endsWith("/schedule.json") || url.pathname.endsWith("schedule.json");
+  const path = url.pathname;
+  const isSchedule = path.endsWith("/schedule.json") || path.endsWith("schedule.json");
+  const isAppJs = path.endsWith("/app.js") || path.endsWith("app.js");
+  const isStyles = path.endsWith("/styles.css") || path.endsWith("styles.css");
 
   if (request.mode === "navigate") {
     event.respondWith(cacheFirst(request));
     return;
   }
 
-  if (isSchedule) {
+  if (isSchedule || isAppJs) {
+    event.respondWith(networkFirst(request));
+    return;
+  }
+
+  if (isStyles) {
     event.respondWith(staleWhileRevalidate(request));
     return;
   }
