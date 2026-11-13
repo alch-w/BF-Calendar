@@ -36,6 +36,12 @@ let flagsTodayOnly = loadFlagsTodayOnly();
 /** "cards" is the richer Flagged rows; "compact" is the one-line view. */
 let flagsView = loadFlagsView();
 
+/** Shown under Flagged upcoming after a share or a soft-failed link. */
+let shareNotice = "";
+
+/** Full share URL revealed after Share, so it can be copied by hand. */
+let shareNoticeUrl = "";
+
 function isPlayableSet(set) {
   return set.kind !== "closure";
 }
@@ -311,6 +317,7 @@ function createFlaggedSectionHeader() {
   const controls = document.createElement("div");
   controls.className = "flagged-header-controls";
   controls.appendChild(createFlaggedViewSwitch());
+  controls.appendChild(createFlaggedShareButton());
 
   if (showFlaggedTodayOnlyToggle()) {
     const label = document.createElement("label");
@@ -351,6 +358,8 @@ function toggleFlag(setId) {
   if (flaggedSetIds.has(setId)) flaggedSetIds.delete(setId);
   else flaggedSetIds.add(setId);
   saveFlags();
+  shareNotice = "";
+  shareNoticeUrl = "";
 }
 
 function syncFlagButton(btn, setId) {
@@ -359,6 +368,308 @@ function syncFlagButton(btn, setId) {
   btn.setAttribute("aria-pressed", String(on));
   btn.setAttribute("aria-label", on ? "Unflag set" : "Flag set");
   btn.textContent = on ? "★" : "☆";
+}
+
+/**
+ * Share links carry flagged sets only, as a short reversible token in the URL hash
+ * (`#f=`). Query `?f=` is accepted too. Opening a valid link replaces local flags.
+ *
+ * Payload (then base64url, no padding):
+ *   u8 version = 1
+ *   u16 schedule fingerprint (FNV-1a over day/stage/set index + start + artist)
+ *   u8 count
+ *   count × u16 big-endian coordinates
+ *     bits 15–13 day index (0–7), bits 12–9 stage index (0–15), bits 8–0 set index (0–511)
+ *   u8 CRC-8 over the preceding bytes
+ * A bad checksum, unknown version, or fingerprint that doesn't match this schedule
+ * leaves the current flags alone.
+ */
+const SHARE_TOKEN_VERSION = 1;
+const SHARE_PARAM = "f";
+
+function fnv1a32Update(hash, str) {
+  let h = hash;
+  for (let i = 0; i < str.length; i += 1) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+function scheduleShareFingerprint() {
+  if (!schedule) return 0;
+  let h = 0x811c9dc5;
+  for (let di = 0; di < schedule.days.length; di += 1) {
+    const day = schedule.days[di];
+    const stages = day.stages || [];
+    for (let si = 0; si < stages.length; si += 1) {
+      const playable = playableSets(stages[si]);
+      for (let pi = 0; pi < playable.length; pi += 1) {
+        const set = playable[pi];
+        h = fnv1a32Update(h, `${di}.${si}.${pi}.${set.start}.${set.artist}\n`);
+      }
+    }
+  }
+  return h & 0xffff;
+}
+
+function locatePlayableSet(setId) {
+  if (!schedule) return null;
+  for (let di = 0; di < schedule.days.length; di += 1) {
+    const day = schedule.days[di];
+    for (let si = 0; si < day.stages.length; si += 1) {
+      const stage = day.stages[si];
+      const playable = playableSets(stage);
+      for (let pi = 0; pi < playable.length; pi += 1) {
+        if (makeSetId(day, stage, playable[pi]) === setId) {
+          return { di, si, pi };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function packSetCoord(di, si, pi) {
+  if (di < 0 || di > 7 || si < 0 || si > 15 || pi < 0 || pi > 511) return null;
+  return ((di & 7) << 13) | ((si & 15) << 9) | (pi & 511);
+}
+
+function unpackSetCoord(word) {
+  return {
+    di: (word >> 13) & 7,
+    si: (word >> 9) & 15,
+    pi: word & 511,
+  };
+}
+
+function crc8(bytes) {
+  let crc = 0;
+  for (let i = 0; i < bytes.length; i += 1) {
+    crc ^= bytes[i];
+    for (let bit = 0; bit < 8; bit += 1) {
+      if (crc & 0x80) crc = ((crc << 1) ^ 0x07) & 0xff;
+      else crc = (crc << 1) & 0xff;
+    }
+  }
+  return crc;
+}
+
+function bytesToBase64Url(bytes) {
+  let bin = "";
+  for (let i = 0; i < bytes.length; i += 1) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function base64UrlToBytes(token) {
+  if (!/^[A-Za-z0-9_-]+$/.test(token)) return null;
+  const padLen = (4 - (token.length % 4)) % 4;
+  const b64 = token.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat(padLen);
+  try {
+    const bin = atob(b64);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i += 1) out[i] = bin.charCodeAt(i);
+    return out;
+  } catch {
+    return null;
+  }
+}
+
+function shareableFlagWords() {
+  if (!schedule) return null;
+  const words = [];
+  for (const id of flaggedSetIds) {
+    const loc = locatePlayableSet(id);
+    if (!loc) continue;
+    const word = packSetCoord(loc.di, loc.si, loc.pi);
+    if (word == null) return null;
+    words.push(word);
+  }
+  words.sort((a, b) => a - b);
+  return words;
+}
+
+function encodeFlagsToken() {
+  const words = shareableFlagWords();
+  if (!words || words.length === 0 || words.length > 255) return null;
+  const fp = scheduleShareFingerprint();
+  const bytes = new Uint8Array(4 + words.length * 2 + 1);
+  let o = 0;
+  bytes[o] = SHARE_TOKEN_VERSION;
+  o += 1;
+  bytes[o] = (fp >> 8) & 0xff;
+  o += 1;
+  bytes[o] = fp & 0xff;
+  o += 1;
+  bytes[o] = words.length;
+  o += 1;
+  for (const word of words) {
+    bytes[o] = (word >> 8) & 0xff;
+    o += 1;
+    bytes[o] = word & 0xff;
+    o += 1;
+  }
+  bytes[o] = crc8(bytes.subarray(0, o));
+  return bytesToBase64Url(bytes);
+}
+
+function decodeFlagsToken(token) {
+  if (!schedule || typeof token !== "string") return null;
+  const trimmed = token.trim();
+  if (!trimmed || trimmed.length > 2048) return null;
+  const bytes = base64UrlToBytes(trimmed);
+  if (!bytes || bytes.length < 5 || bytes[0] !== SHARE_TOKEN_VERSION) return null;
+  const fp = (bytes[1] << 8) | bytes[2];
+  if (fp !== scheduleShareFingerprint()) return null;
+  const count = bytes[3];
+  if (count < 1 || bytes.length !== 4 + count * 2 + 1) return null;
+  if (crc8(bytes.subarray(0, bytes.length - 1)) !== bytes[bytes.length - 1]) return null;
+  const ids = [];
+  for (let i = 0; i < count; i += 1) {
+    const word = (bytes[4 + i * 2] << 8) | bytes[4 + i * 2 + 1];
+    const { di, si, pi } = unpackSetCoord(word);
+    const day = schedule.days[di];
+    const stage = day && day.stages[si];
+    const set = stage && playableSets(stage)[pi];
+    if (!day || !stage || !set) return null;
+    ids.push(makeSetId(day, stage, set));
+  }
+  return ids;
+}
+
+function readShareToken() {
+  try {
+    const url = new URL(location.href);
+    const hash = url.hash.replace(/^#/, "");
+    if (hash) {
+      const fromHash = new URLSearchParams(hash).get(SHARE_PARAM);
+      if (fromHash && fromHash.trim()) return fromHash.trim();
+    }
+    const fromQuery = url.searchParams.get(SHARE_PARAM);
+    return fromQuery && fromQuery.trim() ? fromQuery.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+function buildShareUrl(token) {
+  const url = new URL(location.href);
+  url.searchParams.delete(SHARE_PARAM);
+  url.hash = `${SHARE_PARAM}=${token}`;
+  return url.href;
+}
+
+function stripShareTokenFromUrl() {
+  try {
+    const url = new URL(location.href);
+    url.searchParams.delete(SHARE_PARAM);
+    const rawHash = url.hash.replace(/^#/, "");
+    if (rawHash) {
+      const params = new URLSearchParams(rawHash);
+      if (params.has(SHARE_PARAM)) {
+        params.delete(SHARE_PARAM);
+        url.hash = params.toString();
+      }
+    }
+    const next = `${url.pathname}${url.search}${url.hash}`;
+    if (next !== `${location.pathname}${location.search}${location.hash}`) {
+      history.replaceState(null, "", next || "/");
+    }
+  } catch {
+    /* leave the address bar alone */
+  }
+}
+
+function applySharedFlagsFromUrl() {
+  try {
+    const token = readShareToken();
+    if (!token) return false;
+    const ids = decodeFlagsToken(token);
+    if (!ids) {
+      shareNotice = "That share link didn’t match this schedule. Your flags are unchanged.";
+      return false;
+    }
+    flaggedSetIds = new Set(ids);
+    saveFlags();
+    stripShareTokenFromUrl();
+    shareNotice = "Flags replaced from the shared link.";
+    shareNoticeUrl = "";
+    return true;
+  } catch {
+    shareNotice = "That share link didn’t match this schedule. Your flags are unchanged.";
+    return false;
+  }
+}
+
+function renderAfterSharedFlags() {
+  if (!schedule) return;
+  const nowHidden = document.getElementById("view-now")?.hidden;
+  if (!nowHidden) renderNow();
+  else renderFlaggedUpcoming(new Date());
+  const scheduleView = document.getElementById("view-schedule");
+  if (scheduleView && !scheduleView.hidden) renderSchedule();
+}
+
+function onShareUrlChanged() {
+  if (!schedule || !readShareToken()) return;
+  applySharedFlagsFromUrl();
+  renderAfterSharedFlags();
+}
+
+function copyTextFallback(text) {
+  try {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "0";
+    area.style.left = "-9999px";
+    document.body.appendChild(area);
+    area.focus();
+    area.select();
+    const ok = document.execCommand("copy");
+    area.remove();
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
+function shareFlaggedSets() {
+  const token = encodeFlagsToken();
+  if (!token) {
+    shareNotice = "Flag a set to share.";
+    shareNoticeUrl = "";
+    renderFlaggedUpcoming(new Date(), "share");
+    return;
+  }
+  const url = buildShareUrl(token);
+  const show = (copied) => {
+    shareNotice = copied
+      ? "Link copied. Opening it replaces flags."
+      : "Copy this link. Opening it replaces flags.";
+    shareNoticeUrl = url;
+    renderFlaggedUpcoming(new Date(), copied ? "share" : "share-url");
+  };
+  if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+    navigator.clipboard.writeText(url).then(() => show(true)).catch(() => show(copyTextFallback(url)));
+  } else {
+    show(copyTextFallback(url));
+  }
+}
+
+function createFlaggedShareButton() {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "flagged-share-btn";
+  btn.textContent = "Share";
+  const words = shareableFlagWords();
+  const canShare = Boolean(words && words.length > 0);
+  btn.disabled = !canShare;
+  btn.setAttribute("aria-label", canShare ? "Share flagged sets" : "Flag a set to share");
+  if (!canShare) btn.title = "Flag a set to share";
+  btn.addEventListener("click", () => shareFlaggedSets());
+  return btn;
 }
 
 function collectFlaggedUpcoming(now = new Date()) {
@@ -503,6 +814,26 @@ function renderFlaggedUpcoming(now = new Date(), focusView = null) {
   el.flaggedUpcoming.replaceChildren();
   el.flaggedUpcoming.appendChild(createFlaggedSectionHeader());
 
+  if (shareNotice) {
+    const note = document.createElement("p");
+    note.id = "flagged-share-status";
+    note.className = "flagged-share-status";
+    note.setAttribute("role", "status");
+    note.textContent = shareNotice;
+    el.flaggedUpcoming.appendChild(note);
+  }
+  if (shareNoticeUrl) {
+    const field = document.createElement("input");
+    field.className = "flagged-share-url";
+    field.type = "text";
+    field.readOnly = true;
+    field.value = shareNoticeUrl;
+    field.setAttribute("aria-label", "Share link");
+    field.spellcheck = false;
+    field.addEventListener("focus", () => field.select());
+    el.flaggedUpcoming.appendChild(field);
+  }
+
   if (items.length === 0) {
     const hasAnyFlag = flaggedSetIds.size > 0;
     const hasLaterWhenTodayOnly =
@@ -534,6 +865,15 @@ function renderFlaggedUpcoming(now = new Date(), focusView = null) {
   if (focusView === "cards" || focusView === "compact") {
     const btn = el.flaggedUpcoming.querySelector(`[data-flags-view="${focusView}"]`);
     if (btn instanceof HTMLElement) btn.focus();
+  } else if (focusView === "share") {
+    const btn = el.flaggedUpcoming.querySelector(".flagged-share-btn");
+    if (btn instanceof HTMLElement) btn.focus();
+  } else if (focusView === "share-url") {
+    const field = el.flaggedUpcoming.querySelector(".flagged-share-url");
+    if (field instanceof HTMLInputElement) {
+      field.focus();
+      field.select();
+    }
   }
 }
 
@@ -1227,6 +1567,7 @@ function wireUi() {
   document.querySelectorAll(".tab").forEach((tab) => {
     tab.addEventListener("click", () => setView(tab.dataset.view));
   });
+  window.addEventListener("hashchange", () => onShareUrlChanged());
   wireRabbitEgg();
 }
 
@@ -1251,6 +1592,8 @@ async function init() {
     showLoadError(e);
     return;
   }
+
+  applySharedFlagsFromUrl();
 
   try {
     const active = findActiveDay();
