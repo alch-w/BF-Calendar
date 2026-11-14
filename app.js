@@ -888,10 +888,6 @@ function findActiveDay(now = new Date()) {
   const scheduled = visibleDayIndices().map((i) => ({ index: i, day: schedule.days[i] }));
   if (scheduled.length === 0) return null;
 
-  const today = localDateString(now);
-  const exact = scheduled.find((x) => x.day.date === today);
-  if (exact) return { index: exact.index, day: exact.day, mode: "live" };
-
   const t = now.getTime();
   const withEnds = scheduled.map(({ index, day }) => {
     let dayEnd = 0;
@@ -909,8 +905,19 @@ function findActiveDay(now = new Date()) {
     return { index, day, dayStart, dayEnd };
   });
 
-  const inProgress = withEnds.find((x) => t >= x.dayStart && t <= x.dayEnd);
-  if (inProgress) return { index: inProgress.index, day: inProgress.day, mode: "live" };
+  // A festival day keeps running after midnight until its stages close.
+  // The clock date may already be the next festival date; that programme
+  // has not started, so the earlier still-open day stays live.
+  const running = withEnds
+    .filter((x) => Number.isFinite(x.dayStart) && t >= x.dayStart && t <= x.dayEnd)
+    .sort((a, b) => a.dayStart - b.dayStart);
+  if (running.length > 0) {
+    return { index: running[0].index, day: running[0].day, mode: "live" };
+  }
+
+  const today = localDateString(now);
+  const exact = withEnds.find((x) => x.day.date === today);
+  if (exact) return { index: exact.index, day: exact.day, mode: "live" };
 
   const upcoming = withEnds.filter((x) => x.dayStart > t).sort((a, b) => a.dayStart - b.dayStart)[0];
   if (upcoming) return { index: upcoming.index, day: upcoming.day, mode: "upcoming" };
@@ -961,7 +968,7 @@ function renderNow() {
 
   const now = new Date();
   const dayLabel = active.day.label;
-  if (active.mode === "live" && localDateString(now) === active.day.date) {
+  if (active.mode === "live") {
     el.contextLine.textContent = `${dayLabel} · ${active.day.date} · live${tz}`;
     el.nowBanner.classList.add("hidden");
   } else if (active.mode === "upcoming") {
