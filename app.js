@@ -1470,98 +1470,123 @@ function startClockTick() {
   }, 30_000);
 }
 
-/** @type {boolean} */
-let rabbitRainRunning = false;
+/** How long each press keeps spawning rabbits. */
+const RABBIT_WAVE_MS = 3500;
+
+/** Spawn interval for each wave. Matches the original single-rain cadence. */
+const RABBIT_SPAWN_MS = 95;
+
+/**
+ * Concurrent spawn waves. Each press adds one full wave on top of rabbits
+ * already falling. High enough that a handful of extra presses still stack;
+ * low enough that mashing the button cannot pin the main thread.
+ */
+const RABBIT_MAX_WAVES = 24;
+
+/** @type {HTMLElement | null} */
+let rabbitRainLayer = null;
 
 /** @type {number | null} */
 let rabbitRainRaf = null;
 
-/** @type {ReturnType<typeof setInterval> | null} */
-let rabbitRainSpawnTimer = null;
+/** @type {{ el: HTMLElement; x: number; y: number; vy: number; drift: number }[]} */
+let rabbitDrops = [];
 
-function stopRabbitRainLayer(layer) {
-  if (rabbitRainSpawnTimer !== null) {
-    clearInterval(rabbitRainSpawnTimer);
-    rabbitRainSpawnTimer = null;
-  }
-  if (rabbitRainRaf !== null) {
-    cancelAnimationFrame(rabbitRainRaf);
-    rabbitRainRaf = null;
-  }
-  layer.remove();
-  rabbitRainRunning = false;
+/**
+ * Active spawn waves. Removed when that press's spawn window ends.
+ * Rabbits already created stay in `rabbitDrops` and keep falling.
+ * @type {{ until: number; timer: ReturnType<typeof setInterval> }[]}
+ */
+let rabbitWaves = [];
+
+function spawnRabbitDrop() {
+  const layer = rabbitRainLayer;
+  if (!layer) return;
+  const el = document.createElement("span");
+  el.className = "rabbit-rain-drop";
+  el.textContent = "🐰";
+  const maxX = Math.max(0, window.innerWidth - 28);
+  const x = Math.random() * maxX;
+  rabbitDrops.push({
+    el,
+    x,
+    y: -24 - Math.random() * 40,
+    vy: 2.2 + Math.random() * 2.8,
+    drift: (Math.random() - 0.5) * 1.1,
+  });
+  layer.appendChild(el);
 }
 
-function startRabbitRain() {
-  if (rabbitRainRunning) return;
-  rabbitRainRunning = true;
-
+function ensureRabbitRainLayer() {
+  if (rabbitRainLayer && rabbitRainLayer.isConnected) return;
   const layer = document.createElement("div");
   layer.className = "rabbit-rain-layer";
   layer.setAttribute("aria-hidden", "true");
   document.body.appendChild(layer);
+  rabbitRainLayer = layer;
+}
 
-  const durationMs = 3500;
-  const spawnUntil = performance.now() + durationMs;
-  /** @type {{ el: HTMLElement; x: number; y: number; vy: number; drift: number }[]} */
-  const drops = [];
+function teardownRabbitRainIfIdle() {
+  if (rabbitWaves.length > 0 || rabbitDrops.length > 0) return;
+  if (rabbitRainRaf !== null) {
+    cancelAnimationFrame(rabbitRainRaf);
+    rabbitRainRaf = null;
+  }
+  if (rabbitRainLayer) {
+    rabbitRainLayer.remove();
+    rabbitRainLayer = null;
+  }
+}
 
-  const spawnDrop = () => {
-    const el = document.createElement("span");
-    el.className = "rabbit-rain-drop";
-    el.textContent = "🐰";
-    const maxX = Math.max(0, window.innerWidth - 28);
-    const x = Math.random() * maxX;
-    drops.push({
-      el,
-      x,
-      y: -24 - Math.random() * 40,
-      vy: 2.2 + Math.random() * 2.8,
-      drift: (Math.random() - 0.5) * 1.1,
-    });
-    layer.appendChild(el);
-  };
+function tickRabbitRain() {
+  const vh = window.innerHeight;
+  for (let i = rabbitDrops.length - 1; i >= 0; i -= 1) {
+    const drop = rabbitDrops[i];
+    drop.y += drop.vy;
+    drop.x += drop.drift;
+    drop.el.style.transform = `translate3d(${drop.x}px, ${drop.y}px, 0)`;
+    if (drop.y > vh - 64) {
+      const fade = Math.max(0, 1 - (drop.y - (vh - 64)) / 64);
+      drop.el.style.opacity = String(fade);
+    }
+    if (drop.y > vh + 32) {
+      drop.el.remove();
+      rabbitDrops.splice(i, 1);
+    }
+  }
 
-  rabbitRainSpawnTimer = setInterval(() => {
-    if (performance.now() >= spawnUntil) {
-      if (rabbitRainSpawnTimer !== null) clearInterval(rabbitRainSpawnTimer);
-      rabbitRainSpawnTimer = null;
+  if (rabbitWaves.length === 0 && rabbitDrops.length === 0) {
+    rabbitRainRaf = null;
+    teardownRabbitRainIfIdle();
+    return;
+  }
+  rabbitRainRaf = requestAnimationFrame(tickRabbitRain);
+}
+
+function ensureRabbitRainLoop() {
+  if (rabbitRainRaf !== null) return;
+  rabbitRainRaf = requestAnimationFrame(tickRabbitRain);
+}
+
+function startRabbitRain() {
+  if (rabbitWaves.length >= RABBIT_MAX_WAVES) return;
+
+  ensureRabbitRainLayer();
+  const until = performance.now() + RABBIT_WAVE_MS;
+  const timer = setInterval(() => {
+    if (performance.now() >= until) {
+      clearInterval(timer);
+      const idx = rabbitWaves.findIndex((wave) => wave.timer === timer);
+      if (idx !== -1) rabbitWaves.splice(idx, 1);
+      teardownRabbitRainIfIdle();
       return;
     }
-    spawnDrop();
-    if (Math.random() < 0.35) spawnDrop();
-  }, 95);
-
-  const startedAt = performance.now();
-
-  const tick = () => {
-    const vh = window.innerHeight;
-    for (let i = drops.length - 1; i >= 0; i -= 1) {
-      const drop = drops[i];
-      drop.y += drop.vy;
-      drop.x += drop.drift;
-      drop.el.style.transform = `translate3d(${drop.x}px, ${drop.y}px, 0)`;
-      if (drop.y > vh - 64) {
-        const fade = Math.max(0, 1 - (drop.y - (vh - 64)) / 64);
-        drop.el.style.opacity = String(fade);
-      }
-      if (drop.y > vh + 32) {
-        drop.el.remove();
-        drops.splice(i, 1);
-      }
-    }
-
-    const spawnDone = performance.now() >= spawnUntil;
-    const elapsed = performance.now() - startedAt;
-    if ((spawnDone && drops.length === 0) || elapsed > durationMs + 4500) {
-      stopRabbitRainLayer(layer);
-      return;
-    }
-    rabbitRainRaf = requestAnimationFrame(tick);
-  };
-
-  spawnDrop();
-  rabbitRainRaf = requestAnimationFrame(tick);
+    spawnRabbitDrop();
+    if (Math.random() < 0.35) spawnRabbitDrop();
+  }, RABBIT_SPAWN_MS);
+  rabbitWaves.push({ until, timer });
+  spawnRabbitDrop();
+  ensureRabbitRainLoop();
 }
 
 function wireRabbitEgg() {
